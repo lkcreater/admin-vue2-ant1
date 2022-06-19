@@ -31,7 +31,12 @@
 
 				<!-- Page Content -->
 				<a-layout-content>
-					<router-view />
+					<router-view v-slot="{ Component }">
+						<!-- Use any custom transition and fallback to `fade` -->
+						<transition :name="slide-right">
+							<component :is="Component" />
+						</transition>
+					</router-view>
 				</a-layout-content>
 				<!-- / Page Content -->
 

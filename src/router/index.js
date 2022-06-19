@@ -24,6 +24,15 @@ let routes = [
 		component: () => import(/* webpackChunkName: "dashboard" */ '../views/Dashboard.vue'),
 	},
 	{
+		path: '/categorys',
+		name: 'Categorys',
+		layout: "dashboard",
+		meta: {
+			layoutClass: 'layout-profile',
+		},
+		component: () => import('../views/Categorys.vue'),
+	},
+	{
 		path: '/layout',
 		name: 'Layout',
 		layout: "dashboard",

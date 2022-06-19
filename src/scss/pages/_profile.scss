@@ -69,6 +69,24 @@
 	}
 }
 
+.profile-nav-bg-short {
+	height: 150px;
+	margin-top: -137.8px;
+	border-radius: 12px;
+	box-shadow: $shadow-1;
+	background-size: cover;
+	background-position: center;
+
+	@media( min-width: $md ){
+		margin-top: -87.8px;
+	}
+
+	@media( max-width: $xs ){
+		height: 200px;
+		margin-top: -70.8px;
+	}
+}
+
 .settings-list {
 	list-style: none;
 	padding: 0;
