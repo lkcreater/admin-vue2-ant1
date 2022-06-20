@@ -246,14 +246,18 @@
                 columns,
 				// Active button for the "User Profile" card's radio button group.
 				profileHeaderBtns: 'overview',
+                api: []
 			}
 		},
         methods: {           
             afterVisibleChange(val){
                 console.log('visible', val);
             },
-            aDrawerShow() {
-                console.log(this.$models.categorys.create());
+            async aDrawerShow() {
+                await this.$models.categorys.findAll().then((res) => {
+                    this.api = res.data;
+                });
+                console.log(this.api.result[0].title);
                 this.visibleDrawerForm = true;
             },
             aDrawerClose() {
