@@ -9,6 +9,9 @@ const model = function(config){
         },
         create: function(attrib){
             return axios.post(url_api, attrib);
+        },
+        update: function(id, attrib){
+            return axios.put(url_api + '/' + id, attrib);
         }
     }
 };

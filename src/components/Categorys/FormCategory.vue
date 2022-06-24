@@ -113,6 +113,7 @@ export default {
         return {
             form: this.$form.createForm(this, { name: 'coordinated' }),
             titleHeader: 'Create a new category',
+            modelUpdate: null,
             visibleDrawerForm: false,
             resultStatus: {
                 loading: false,
@@ -123,11 +124,25 @@ export default {
             }
         }
     },
-    methods: {           
-        afterVisibleChange(val){
-            console.log('visible', val);
-        },
-        aDrawerShow() {
+    methods: {  
+        
+        aDrawerShow(object) {
+            if(object != null){
+                this.titleHeader = 'Edit : ' + object.title;
+                this.modelUpdate = object;
+                this.form.getFieldDecorator("title");
+                this.form.getFieldDecorator("slug");
+                this.form.getFieldDecorator("desc");
+                this.form.setFieldsValue({
+                    title: object.title,
+                    slug: object.slug,
+                    desc: object.desc
+                });
+            }else{
+                this.titleHeader = 'Create a new category';
+                this.modelUpdate = null;
+                this.form.resetFields();
+            }
             this.visibleDrawerForm = true;
         },
         aDrawerClose() {
@@ -137,29 +152,62 @@ export default {
         handleSubmit(e) {
             e.preventDefault();
 
-            this.form.validateFields( async (err, values) => {
+            this.form.validateFields((err, values) => {
                 if (!err) {
                     this.resultStatus.show = true;
                     this.resultStatus.loading = true;
-                    await this.$models.categorys.create(values).then((res)=>{
-                        if(res.status == 200){
-                            this.resultStatus.subTitle = res.data.result.title;
-                            setTimeout(() => {
-                                this.form.resetFields();
-                                this.resultStatus.loading = false;
-                            }, 500);   
-                        }                         
-                    })
-                    .catch((err) => {
-                        this.resultStatus.show = false;
-                        this.resultStatus.loading = false;
-                        this.$notification.error({
-                            message: err.message,
-                            description: err.response.statusText,
-                        });
-                    });                        
+                    if(this.modelUpdate == null){
+                        this.setApiCreate(values);    
+                    }else{
+                        this.setApiUpdate(this.modelUpdate.id, values);
+                    }                       
                 }
             });
+        },
+        async setApiCreate(attrib) {
+            await this.$models.categorys.create(attrib).then((res)=>{
+                if(res.status == 200){
+                    this.resultStatus.subTitle = res.data.result.title;
+                    this.onPassCreateSuccess(res.data.result);
+                    setTimeout(() => {
+                        this.form.resetFields();
+                        this.resultStatus.loading = false;
+                    }, 500);   
+                }                         
+            })
+            .catch((err) => {
+                this.resultStatus.show = false;
+                this.resultStatus.loading = false;
+                this.$notification.error({
+                    message: err.message,
+                    description: err.response.statusText,
+                });
+            }); 
+        },
+        async setApiUpdate(id, attrib) {
+            const object = {
+                title: attrib.title,
+                slug: attrib.slug,
+                desc: attrib.desc
+            };
+            await this.$models.categorys.update(id, object).then((res)=>{
+                if(res.status == 200){
+                    this.resultStatus.subTitle = res.data.result.title;
+                    this.onPassUpdateSuccess(res.data.result);
+                    setTimeout(() => {
+                        this.form.resetFields();
+                        this.resultStatus.loading = false;
+                    }, 500);   
+                }                         
+            })
+            .catch((err) => {
+                this.resultStatus.show = false;
+                this.resultStatus.loading = false;
+                this.$notification.error({
+                    message: err.message,
+                    description: err.response.statusText,
+                });
+            }); 
         },
         resetResultMessage(){
             this.resultStatus = {
@@ -169,7 +217,13 @@ export default {
                 title: this.resultStatus.title,
                 subTitle: ''
             };
-        }   
+        },
+        onPassCreateSuccess(result){
+            this.$emit('create-success', result);
+        },
+        onPassUpdateSuccess(result){
+            this.$emit('update-success', result);
+        }
     },
 }
 </script>
