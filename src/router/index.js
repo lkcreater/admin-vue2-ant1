@@ -33,6 +33,18 @@ let routes = [
 		component: () => import('../views/Categorys.vue'),
 	},
 	{
+		path: '/posts',
+		name: 'Posts',
+		layout: "dashboard",
+		component: () => import('../views/Posts.vue'),
+	},
+	{
+		path: '/form-post',
+		name: 'Form post',
+		layout: "dashboard",
+		component: () => import('../views/FormPost.vue'),
+	},
+	{
 		path: '/layout',
 		name: 'Layout',
 		layout: "dashboard",

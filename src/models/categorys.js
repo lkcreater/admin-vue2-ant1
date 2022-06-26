@@ -12,6 +12,9 @@ const model = function(config){
         },
         update: function(id, attrib){
             return axios.put(url_api + '/' + id, attrib);
+        },
+        delete: function(id){
+            return axios.delete(url_api + '/' + id, attrib);
         }
     }
 };
