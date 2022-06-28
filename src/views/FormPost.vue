@@ -5,8 +5,19 @@
         @submit="handleSubmit"
         >
 
+        <a-row type="flex" justify="end" style="margin-bottom: 15px; padding-right: 12px;">
+            <a-col>
+                <a-button type="primary" style="margin-right: 15px;">
+                    Submit
+                </a-button>
+                <a-button>
+                    Cancel
+                </a-button>
+            </a-col>
+        </a-row>
+
         <a-row>
-            <a-col :md="18" :sm="24">
+            <a-col :md="18" :sm="24" style="padding: 0px 12px">
                 <a-card :bordered="false" class="header-solid h-full mb-24">
                     <template #title>
                         <h6 class="font-semibold">Content Info</h6>			
@@ -40,56 +51,66 @@
 
                     <a-row class="mb-10">
                         <a-col :md="24" class="pd-input" style="padding-bottom: 40px;">
-                            <div class="ant-col ant-form-item-label">
-                                <label class="ant-form-item-no-colon"> Content</label>
-                            </div>                                 
-                            <quill-editor ref="text-editor-quill" v-model="quillContent" :options="quillOptions" style="height: 150px;"></quill-editor>                   
+                            <text-quill-editor label="Content" v-model="quillContent" height="200"></text-quill-editor>                  
                         </a-col>
                     </a-row>
-                    
-                    <a-button @click="test">click</a-button>
+
+                    <a-row class="mb-10">
+                        <a-col :md="24" class="pd-input" >
+                            <a-form-item class="mb-10" label="Content excerpt" :colon="false">
+                                <a-textarea
+                                    placeholder="Autosize height with minimum and maximum number of lines"
+                                    :auto-size="{ minRows: 3, maxRows: 6 }"
+                                    >
+                                </a-textarea> 
+                            </a-form-item>                                           
+                        </a-col>
+                    </a-row>
+
                 </a-card>
             </a-col>
-            <a-col></a-col>
+            <a-col :md="6" :sm="24" style="padding: 0px 12px">
+                <a-card :bordered="false" class="header-solid h-full mb-24">
+                    <template #title>
+                        <h6 class="font-semibold">Thumbnail</h6>			
+                        <p>Picture of the content</p>	
+                    </template>
+
+                    <a-row>
+                        <a-col>
+                            <div class="clearfix">
+                                <file-upload-thumbnail v-model="files" src-preview=""></file-upload-thumbnail>
+                            </div>
+                        </a-col>                        
+                    </a-row>
+                </a-card>
+            </a-col>
         </a-row>
         
     </a-form>
 </template>
 
 <script>
-import 'quill/dist/quill.core.css' ;
-import 'quill/dist/quill.snow.css' ;
-import { quillEditor } from 'vue-quill-editor'
+import TextQuillEditor from '@/components/Form/TextQuillEditor';
+import FileUploadThumbnail from '@/components/Form/FileUploadThumbnail';
 
 export default {
     components: {
-        quillEditor
+        TextQuillEditor,
+        FileUploadThumbnail
     },
     data() {
         return {
             form: this.$form.createForm(this, { name: 'form_post' }),
             // Quill editor html content.
-            quillContent: '<p>Some initial <strong>bold</strong> text</p>',
-
-            // Quill editor options.
-            quillOptions: {
-                modules: {
-                    toolbar: [
-                        [{ 'header': [1, 2, 3, false] }],
-                        ['bold', 'italic', 'underline'],
-                        [{ 'list': 'ordered' }, { 'list': 'bullet' }, 'link'],
-                        ['clean'],
-                    ]
-                },
-            },
+            quillContent: '<p>sdsdsddsfdsfd</p>',
+            files: [],
         };
     },
+    mounted() {
+        console.log(this.files);
+    },
     methods: {
-        test(){
-            let editor = this.$refs['text-editor-quill'].quill;
-            let indexCursor = editor.getSelection().index;
-            editor.clipboard.dangerouslyPasteHTML(indexCursor, '<img src="https://nodei.co/npm/vue-quill-editor.png?downloads=true&amp;downloadRank=true&amp;stars=true" alt="NPM">')
-        },
         handleSubmit(){
 
         },
@@ -98,7 +119,8 @@ export default {
         },
         onOk(){
 
-        }
+        },
+        
     },
 }
 </script>
@@ -107,9 +129,5 @@ export default {
 .pd-input{
     padding-left: 12px; 
     padding-right: 12px;
-}
-.ql-toolbar.ql-snow,
-.ql-container.ql-snow {
-    border: 1px solid #bfbfbf;
 }
 </style>
