@@ -1,14 +1,14 @@
 <template>
     <div>
-        <a-form
-        id="components-form"
-        :form="form"
-        @submit="handleSubmit"
+        <a-form-model
+        ref="components-form"
+        :model="forms"
+        :rules="rules"
         >
 
             <a-row type="flex" justify="end" style="margin-bottom: 15px; padding-right: 12px;">
                 <a-col>
-                    <a-button type="primary" style="margin-right: 15px;">
+                    <a-button type="primary" @click="handleValidateSubmit" style="margin-right: 15px;">
                         Submit
                     </a-button>
                     <a-button>
@@ -25,34 +25,26 @@
                             <p>Architects design houses</p>	
                         </template>
                         
-                        <a-form-item class="mb-10 pd-input" label="Title" :colon="false">
-                            <a-input 
-                            size="small"
-                            v-decorator="[
-                            'title',
-                            { rules: [{ required: true, message: 'Please input your title!' }] },
-                            ]" placeholder="Title" />
-                        </a-form-item>
+                        <a-form-model-item  class="mb-10 pd-input" label="Title" :colon="false" prop="title">
+                            <a-input size="small" v-model="forms.title" placeholder="Title" />
+                        </a-form-model-item >
 
                         <a-row>
                             <a-col :md="18">
                                 <a-form-item class="pd-input mb-10" label="Slug" :colon="false">
-                                    <a-input 
-                                    size="small"
-                                    v-decorator="['slug']" 
-                                    placeholder="Slug url" />
+                                    <a-input size="small" v-model="forms.slug"  placeholder="Slug url" />
                                 </a-form-item>
                             </a-col>
                             <a-col :md="6">
                                 <a-form-item class="pd-input mb-10" label="Public date" :colon="false">
-                                    <a-date-picker size="small" show-time placeholder="Select Time" @change="onChange" @ok="onOk" />
+                                    <a-date-picker size="small" v-model="forms.public_date_at" show-time placeholder="Select Time" @change="onChange" @ok="onOk" />
                                 </a-form-item>                            
                             </a-col>
                         </a-row>
 
                         <a-row class="mb-10">
                             <a-col :md="24" class="pd-input" style="padding-bottom: 40px;">
-                                <text-quill-editor label="Content" v-model="quillContent" height="200"></text-quill-editor>                  
+                                <text-quill-editor label="Content" v-model="forms.content" height="200"></text-quill-editor>                  
                             </a-col>
                         </a-row>
 
@@ -60,6 +52,7 @@
                             <a-col :md="24" class="pd-input" >
                                 <a-form-item class="mb-10" label="Content excerpt" :colon="false">
                                     <a-textarea
+                                        v-model="forms.content_excerpt"
                                         placeholder="Autosize height with minimum and maximum number of lines"
                                         :auto-size="{ minRows: 3, maxRows: 6 }"
                                         >
@@ -81,7 +74,7 @@
                         <a-row>
                             <a-col>
                                 <div class="clearfix">
-                                    <file-upload-thumbnail v-model="files" src-preview=""></file-upload-thumbnail>
+                                    <file-upload-thumbnail v-model="forms.file" src-preview=""></file-upload-thumbnail>
                                 </div>
                             </a-col>                        
                         </a-row>
@@ -104,7 +97,7 @@
 
                         <a-row>
                             <a-col style="padding:10px; height: 200px; overflow: scroll;">
-                                <a-checkbox-group @change="onChange">
+                                <a-checkbox-group @change="onSelectCategory">
                                     <a-row>
                                         <a-col :span="24" v-for="item in dataCateory" :key="item.id">
                                             <a-checkbox :value="item.id">
@@ -129,7 +122,7 @@
 
                         <a-row>
                             <a-col>
-                                <span v-for="tag in tags" :key="tag.id">
+                                <span v-for="tag in forms.tags" :key="tag.id">
                                     <a-tag :color="tag.color" closable @close="() => handleRemoveTag(tag)" style="margin: 3px;">
                                         {{ tag.title }}
                                     </a-tag>
@@ -157,7 +150,7 @@
                 </a-col>
             </a-row>
         
-        </a-form>
+        </a-form-model>
 
         <form-category ref="idFormCategory" @create-success="onCreateCategorySuccess"></form-category>
     </div>
@@ -167,7 +160,21 @@
 import TextQuillEditor from '@/components/Form/TextQuillEditor';
 import FileUploadThumbnail from '@/components/Form/FileUploadThumbnail';
 import FormCategory from '@/components/Categorys/FormCategory';
+import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';
+
+var instanceModels = function() {
+    return {
+        title: '',
+        slug: '',
+        public_date_at: moment(),
+        content: '',
+        content_excerpt: '',
+        file: [],
+        selectCategory: [],
+        tags: []
+    }
+}
 
 export default {
     components: {
@@ -177,16 +184,18 @@ export default {
     },
     data() {
         return {
-            form: this.$form.createForm(this, { name: 'form_post' }),
-            /* Quill editor html content. */
-            quillContent: '<p>sdsdsddsfdsfd</p>',
-            files: [],
+            forms: instanceModels(),
+            rules: {
+                title: [
+                    { required: true, message: 'Please input Title', trigger: 'blur' },
+                ]
+            },
+
+            /* provider data */
             dataCateory: [],
 
             /* tags sector */
-            tags: [],
             inputVisible: false,
-            inputValue: '',
         };
     },
     mounted() {
@@ -206,8 +215,42 @@ export default {
                 });
             });
         },
-        handleSubmit(){
+        handleValidateSubmit(){         
+            this.$refs['components-form'].validate( async (valid) => {                
+                if(valid){
 
+                    this.sendDataFormPost();
+
+                    return false;
+                }
+                return false;                
+            });
+        },
+        async sendDataFormPost(){
+
+            var formData = new FormData();      
+            for (const [key, value] of Object.entries(this.forms)) {                
+                if(key === 'file'){                   
+                    let file = (value.length > 0) ? value[0].file : null;
+                    formData.append(key, file);
+                }else if(key === 'selectCategory' || key === 'tags'){
+                    formData.append(key, JSON.stringify(value));                    
+                }else{ 
+                    formData.append(key, value);
+                }
+            }      
+            
+            await this.$models.post.create(formData).then((res)=>{
+                if(res.status == 200){
+                    console.log(res);
+                }                         
+            })
+            .catch((err) => {
+                this.$notification.error({
+                    message: err.message,
+                    description: err.response.statusText,
+                });
+            }); 
         },
         onChange(){
 
@@ -218,6 +261,9 @@ export default {
 
         /**********************/
         //** category sector
+        onSelectCategory(selectValues){            
+            this.forms.selectCategory = selectValues;
+        },
         onOpenFormNewCategory(){
             this.$refs.idFormCategory.aDrawerShow(null);
         },
@@ -241,7 +287,7 @@ export default {
         handleInputConfirmTag(val) {
 
             // add new tag
-            let tags = this.tags;
+            let tags = this.forms.tags;
             if(val && !tags.find((ele) => ele.title === val)){
                 let create_new_tag = {
                     id: uuidv4(),
@@ -250,19 +296,18 @@ export default {
                     isNewRecord: true
                 };
 
-                tags = [...tags, create_new_tag];
+                this.forms.tags = [...tags, create_new_tag];
             }
 
             // reset object
             Object.assign(this, {
-                tags,
                 inputVisible: false,
             });
         },
         handleRemoveTag(removedTag) {
-            const tags = this.tags.filter(tag => tag.title !== removedTag);
+            const tags = this.forms.tags.filter(tag => tag.title !== removedTag);
             //console.log(tags);
-            this.tags = tags;
+            this.forms.tags = tags;
         },
     },
 }
