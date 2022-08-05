@@ -6,7 +6,12 @@
         :rules="rules"
         >
 
-            <a-row type="flex" justify="end" style="margin-bottom: 15px; padding-right: 12px;">
+            <a-row type="flex" justify="space-between" style="margin-bottom: 15px; padding-right: 12px; padding-left: 15px;">
+                <a-col>
+                    <a-button type="dashed" shape="circle" @click="$router.push({ path: '/posts' })">
+                        <a-icon type="double-left" theme="outlined" /> 
+                    </a-button>
+                </a-col>
                 <a-col>
                     <a-button type="primary" @click="handleValidateSubmit" style="margin-right: 15px;">
                         Submit
@@ -74,7 +79,8 @@
                         <a-row>
                             <a-col>
                                 <div class="clearfix">
-                                    <file-upload-thumbnail v-model="forms.file" src-preview=""></file-upload-thumbnail>
+                                    <file-upload-thumbnail ref="fileUploadObject" v-model="forms.file" src-preview=""></file-upload-thumbnail>
+
                                 </div>
                             </a-col>                        
                         </a-row>
@@ -152,6 +158,25 @@
         
         </a-form-model>
 
+        <a-modal 
+            v-model="objectSuccessForm.visible" 
+            :maskClosable="false"
+            :closable="false"
+            :footer="null"
+            >
+            <a-result
+                status="success"
+                title="Successfully Submit to server"
+                >
+                <template #extra>
+                    <h4>  Go to posts page in {{ objectSuccessForm.countDown }}</h4>
+                    <a-button key="buy" @click="successFormClose">
+                        Create Form Again
+                    </a-button>
+                </template>
+            </a-result>
+        </a-modal>
+
         <form-category ref="idFormCategory" @create-success="onCreateCategorySuccess"></form-category>
     </div>
 </template>
@@ -189,6 +214,11 @@ export default {
                 title: [
                     { required: true, message: 'Please input Title', trigger: 'blur' },
                 ]
+            },
+            objectSuccessForm : {
+                visible: false,
+                countDown: 5,
+                fnInterval: ''
             },
 
             /* provider data */
@@ -242,7 +272,8 @@ export default {
             
             await this.$models.post.create(formData).then((res)=>{
                 if(res.status == 200){
-                    console.log(res);
+                    this.resetForm();
+                    this.successFormOpen();
                 }                         
             })
             .catch((err) => {
@@ -252,12 +283,40 @@ export default {
                 });
             }); 
         },
+        resetForm(){
+            Object.assign(this.forms, instanceModels());
+            this.$refs.fileUploadObject.reset();
+        },
         onChange(){
 
         },
         onOk(){
 
         },
+
+        /**********************/
+        //** modal success sector
+        successFormOpen(){
+            this.objectSuccessForm.visible = true;
+
+            this.objectSuccessForm.fnInterval = setInterval(() => {
+                this.objectSuccessForm.countDown --;
+
+                if(this.objectSuccessForm.countDown == 0){
+                    clearInterval(this.objectSuccessForm.fnInterval);
+                    this.successFormGoToListPage();
+                }
+            }, 1000);            
+        },
+        successFormGoToListPage(){
+            this.$router.push('/posts');
+        },
+        successFormClose(){
+            clearInterval(this.objectSuccessForm.fnInterval);
+            this.objectSuccessForm.visible = false;
+            this.objectSuccessForm.countDown = 5;
+        },
+
 
         /**********************/
         //** category sector

@@ -27,9 +27,6 @@ let routes = [
 		path: '/categorys',
 		name: 'Categorys',
 		layout: "dashboard",
-		meta: {
-			layoutClass: 'layout-profile',
-		},
 		component: () => import('../views/Categorys.vue'),
 	},
 	{
@@ -39,7 +36,7 @@ let routes = [
 		component: () => import('../views/Posts.vue'),
 	},
 	{
-		path: '/form-post',
+		path: '/posts/form',
 		name: 'Form post',
 		layout: "dashboard",
 		component: () => import('../views/FormPost.vue'),

@@ -4,8 +4,12 @@ const model = function(config){
     const url_api = config.api_host + '/post';
 
     return {
-        findAll: function(){
-            return axios.get(url_api);
+        findAll: (page) => {
+            return axios.get(url_api, { 
+                params: { 
+                    page: page 
+                } 
+            });
         },
         create: function(attrib){
             const option = {
@@ -16,11 +20,14 @@ const model = function(config){
             
             return axios.post(url_api, attrib, option);
         },
-        update: function(id, attrib){
+        update: (id, attrib) => {
             return axios.put(url_api + '/' + id, attrib);
         },
+        active: (id, attrib) => {
+            return axios.put(url_api + '/active/' + id, attrib);
+        },
         delete: function(id){
-            return axios.delete(url_api + '/' + id, attrib);
+            return axios.delete(url_api + '/' + id);
         }
     }
 };

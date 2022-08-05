@@ -125,17 +125,18 @@ export default {
         VueCropper
     },    
     props: ['value','srcPreview'],
-    created() {
+    mounted() {
         if(this.srcPreview){
             this.imagePreview = this.srcPreview;
         }
-        if (this.value) {
-            this.files = this.value;
-        }
+        // if (this.value) {
+        //     console.log('file: ', this.value);
+        //     this.files = this.value;
+        // }
     },
     data() {
         return {
-            files: null,
+            files: this.value,
             imgObject: null,
             imagePreview: null,
             modelObject: null,
@@ -226,6 +227,9 @@ export default {
             this.scaleY = !this.scaleY;
             let num = this.scaleY ? 1 : -1;
             this.$refs.cropper.scaleY(num);
+        },
+        reset(){
+            this.onDeleteFile();
         },
         onDeleteFile(){
             // console.log('files', this.files);
