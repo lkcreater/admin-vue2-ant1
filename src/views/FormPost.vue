@@ -5,7 +5,6 @@
         :model="forms"
         :rules="rules"
         >
-
             <a-row type="flex" justify="space-between" style="margin-bottom: 15px; padding-right: 12px; padding-left: 15px;">
                 <a-col>
                     <a-button type="dashed" shape="circle" @click="$router.push({ path: '/posts' })">
@@ -14,7 +13,7 @@
                 </a-col>
                 <a-col>
                     <a-button type="primary" @click="handleValidateSubmit" style="margin-right: 15px;">
-                        Submit
+                        {{ (edit.status == false) ? 'Submit' : 'Update' }}
                     </a-button>
                     <a-button>
                         Cancel
@@ -23,12 +22,23 @@
             </a-row>
 
             <a-row>
+                
                 <a-col :md="18" :sm="24" style="padding: 0px 12px">
                     <a-card :bordered="false" class="header-solid h-full mb-24">
                         <template #title>
                             <h6 class="font-semibold">Content Info</h6>			
-                            <p>Architects design houses</p>	
+                            <p>Enter content to post</p>	
                         </template>
+
+                        <a-alert
+                            v-if="edit.status == true"
+                            message="You are editing now."
+                            type="info"
+                            show-icon
+                            style="margin-bottom: 15px;" >
+
+                            <div slot="description" v-html="edit.desc"></div>
+                        </a-alert>
                         
                         <a-form-model-item  class="mb-10 pd-input" label="Title" :colon="false" prop="title">
                             <a-input size="small" v-model="forms.title" placeholder="Title" />
@@ -79,7 +89,7 @@
                         <a-row>
                             <a-col>
                                 <div class="clearfix">
-                                    <file-upload-thumbnail ref="fileUploadObject" v-model="forms.file" src-preview=""></file-upload-thumbnail>
+                                    <file-upload-thumbnail ref="fileUploadObject" v-model="forms.file" :src-preview="edit.thumbnail"></file-upload-thumbnail>
 
                                 </div>
                             </a-col>                        
@@ -92,7 +102,7 @@
                             <a-row>
                                 <a-col span="14">
                                     <h6 class="font-semibold">Category</h6>			
-                                    <p>Picture of the content</p>
+                                    <p>List Categories</p>
                                 </a-col>
                                 <a-col span="10" style="text-align: right;">
                                     <a-button type="link" @click="onOpenFormNewCategory">New category</a-button>
@@ -103,10 +113,10 @@
 
                         <a-row>
                             <a-col style="padding:10px; height: 200px; overflow: scroll;">
-                                <a-checkbox-group @change="onSelectCategory">
+                                <a-checkbox-group @change="onSelectCategory" v-model="forms.selectCategory">
                                     <a-row>
                                         <a-col :span="24" v-for="item in dataCateory" :key="item.id">
-                                            <a-checkbox :value="item.id">
+                                            <a-checkbox :value="item.id" >
                                                 {{ item.title }}
                                             </a-checkbox>
                                         </a-col>                                   
@@ -121,7 +131,7 @@
                             <a-row>
                                 <a-col>
                                     <h6 class="font-semibold">Tags</h6>			
-                                    <p>Picture of the content</p>
+                                    <p>List Tags</p>
                                 </a-col>
                             </a-row>                                
                         </template>
@@ -129,7 +139,7 @@
                         <a-row>
                             <a-col>
                                 <span v-for="tag in forms.tags" :key="tag.id">
-                                    <a-tag :color="tag.color" closable @close="() => handleRemoveTag(tag)" style="margin: 3px;">
+                                    <a-tag :color="tag.color" closable @close="handleRemoveTag(tag)" style="margin: 3px;">
                                         {{ tag.title }}
                                     </a-tag>
                                 </span>
@@ -221,6 +231,12 @@ export default {
                 fnInterval: ''
             },
 
+            edit: {
+                status: false,
+                thumbnail: '',
+                desc: ''
+            },
+
             /* provider data */
             dataCateory: [],
 
@@ -228,10 +244,55 @@ export default {
             inputVisible: false,
         };
     },
-    mounted() {
+    mounted() {        
+        this.setUpdateItem();
         this.getQueryDataCategory();
     },
     methods: {
+        setUpdateItem(){
+            if(this.$route.params.item){
+                console.log(this.$route.params);
+                const { id, title, slug, public_date_at, content, content_excerpt, options, tags, categorys } = this.$route.params.item;
+
+                let image = '';
+                if(options.image && options.image.length > 0){
+                    const [ {url} ] = options.image;
+                    image = this.$models.url(url);
+                }
+                
+                // setup status
+                this.edit = {
+                    status: true,
+                    thumbnail: image,
+                    desc: '<b>POST : </b>' + title
+                }               
+
+                let valCate = (categorys) ? categorys.map((ele) => ele.cate_id) : [];
+
+                let valTags = (tags) ? tags.map(tag => {
+                    return {
+                        id: tag.tag_id,
+                        title: tag.tag_title,
+                        color: this.genRandomColorTag(),
+                        isNewRecord: false
+                    };
+                }) : [];
+
+                // setup forms
+                this.forms = {
+                    title: title,
+                    slug: slug,
+                    public_date_at: public_date_at,
+                    content: unescape(content),
+                    content_excerpt: content_excerpt,
+                    file: [],
+                    selectCategory: valCate,
+                    tags: valTags
+                }
+
+                return 'update';
+            }
+        },
         async getQueryDataCategory(){
             await this.$models.categorys.findAll().then((res)=>{
                 if(res.status == 200){ 

@@ -62,7 +62,7 @@
         <!-- start thumbnail -->
         <a-row type="flex" justify="center">
             <a-col>
-
+                
                 <!-- preview thumbnail -->
                 <div v-if="!imagePreview">                    
                     <div class="thumbnail-picture-card">                    
@@ -125,14 +125,10 @@ export default {
         VueCropper
     },    
     props: ['value','srcPreview'],
-    mounted() {
-        if(this.srcPreview){
-            this.imagePreview = this.srcPreview;
+    watch: {
+        srcPreview: function(newVal) { 
+           this.imagePreview = newVal
         }
-        // if (this.value) {
-        //     console.log('file: ', this.value);
-        //     this.files = this.value;
-        // }
     },
     data() {
         return {

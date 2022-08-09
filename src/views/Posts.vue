@@ -67,7 +67,7 @@
                         </template>
 
                         <template slot="action" slot-scope="record">     
-                            <a-button type="dashed" size="small" style="margin-right: 5px" @click="btnEditData(record)">
+                            <a-button type="dashed" size="small" style="margin-right: 5px" @click="updateItem(record)">
                                 Edit
                             </a-button> 
                             <a-popconfirm  @confirm="deleteItem(record)">
@@ -157,6 +157,9 @@ export default {
         this.fetch(1);
     },
     methods: {
+        updateItem(item){
+            this.$router.push({ name: 'FormPost', params : { item: item } } )
+        },
         async deleteItem(item){
             await this.$models.post.delete(item.id).then((res)=>{
                 if(res.status == 200){ 
@@ -185,7 +188,7 @@ export default {
                     pagination.pageSize = meta.limit;
                     this.pagination = pagination;
 
-                    console.log(this.dataModels);
+                    //console.log(this.dataModels);
                 }                         
             })
             .catch((err) => {
