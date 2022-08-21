@@ -232,6 +232,7 @@ export default {
             },
 
             edit: {
+                id: '',
                 status: false,
                 thumbnail: '',
                 desc: ''
@@ -262,6 +263,7 @@ export default {
                 
                 // setup status
                 this.edit = {
+                    id: id,
                     status: true,
                     thumbnail: image,
                     desc: '<b>POST : </b>' + title
@@ -331,18 +333,38 @@ export default {
                 }
             }      
             
-            await this.$models.post.create(formData).then((res)=>{
-                if(res.status == 200){
-                    this.resetForm();
-                    this.successFormOpen();
-                }                         
-            })
-            .catch((err) => {
-                this.$notification.error({
-                    message: err.message,
-                    description: err.response.statusText,
-                });
-            }); 
+            // insert record
+            if(this.edit.status === false){
+                await this.$models.post.create(formData).then((res)=>{
+                    if(res.status == 200){
+                        this.resetForm();
+                        this.successFormOpen();
+                    }                         
+                })
+                .catch((err) => {
+                    this.$notification.error({
+                        message: err.message,
+                        description: err.response.statusText,
+                    });
+                }); 
+            }
+
+            // update record by id
+            if(this.edit.status === true){
+                await this.$models.post.update(this.edit.id, formData).then((res)=>{
+                    if(res.status == 200){
+                        //console.log(res.data);
+                        //his.resetForm();
+                        this.successFormOpen();
+                    }                         
+                })
+                .catch((err) => {
+                    this.$notification.error({
+                        message: err.message,
+                        description: err.response.statusText,
+                    });
+                }); 
+            }
         },
         resetForm(){
             Object.assign(this.forms, instanceModels());

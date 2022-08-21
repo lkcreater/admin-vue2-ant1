@@ -21,7 +21,13 @@ const model = function(config){
             return axios.post(url_api, attrib, option);
         },
         update: (id, attrib) => {
-            return axios.put(url_api + '/' + id, attrib);
+            const option = {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            };
+
+            return axios.put(url_api + '/' + id, attrib, option);
         },
         active: (id, attrib) => {
             return axios.put(url_api + '/active/' + id, attrib);
