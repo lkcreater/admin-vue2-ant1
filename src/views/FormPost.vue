@@ -192,8 +192,8 @@
 </template>
 
 <script>
-import TextQuillEditor from '@/components/Form/TextQuillEditor';
-import FileUploadThumbnail from '@/components/Form/FileUploadThumbnail';
+import TextQuillEditor from '@/components/Inputs/TextQuillEditor';
+import FileUploadThumbnail from '@/components/Inputs/FileUploadThumbnail';
 import FormCategory from '@/components/Categorys/FormCategory';
 import moment from 'moment';
 import { v4 as uuidv4 } from 'uuid';

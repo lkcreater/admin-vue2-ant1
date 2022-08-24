@@ -42,6 +42,12 @@ let routes = [
 		component: () => import('../views/FormPost.vue'),
 	},
 	{
+		path: '/users',
+		name: 'Users',
+		layout: "dashboard",
+		component: () => import('../views/Users.vue'),
+	},
+	{
 		path: '/layout',
 		name: 'Layout',
 		layout: "dashboard",

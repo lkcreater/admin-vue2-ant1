@@ -50,6 +50,16 @@
 				</a-menu-item>
 
 				<a-menu-item>
+					<router-link to="/users">
+						<span class="icon">
+							<a-icon type="smile" theme="filled" />
+							
+						</span>
+						<span class="label">Users</span>
+					</router-link>
+				</a-menu-item>
+
+				<a-menu-item>
 					<router-link to="/tables">
 						<span class="icon">
 							<a-icon type="file-text" theme="filled" />

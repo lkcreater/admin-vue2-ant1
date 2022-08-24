@@ -1,0 +1,48 @@
+.tab-custom-setting.ant-tabs-card {
+    padding: 0 20px;
+    
+    .ant-tabs-card-bar.ant-tabs-left-bar {
+        width: 17%;
+        min-width: 200px;
+        border-radius: 12px;
+        box-shadow: 0px 20px 27px rgba(0, 0, 0, 0.05);
+        margin-bottom: 50px;
+        
+        .ant-tabs-nav-wrap{
+            width: 100%;
+            padding: 10px;
+
+            .ant-tabs-tab{
+                border: 0px;
+                border-radius: 10px;
+                padding-top: 13px;
+                line-height: 23px;
+                text-align: center;
+                height: 72px;
+
+                .anticon {
+                    margin-right: 8px;
+                    font-size: 25px;
+                }
+            }
+
+            .ant-tabs-tab:hover{
+                background-color: #eee;
+                color: #999;
+            }
+
+            .ant-tabs-tab-active,
+            .ant-tabs-tab-active:hover{
+                color: #626262;
+                background-color: #d6d6d6;
+            }
+        }
+    }
+
+    .ant-tabs-left-content {
+        padding-left: 24px;
+        border-left: 0;
+        padding-bottom: 50px;
+        padding-right: 24px;
+    }
+}
