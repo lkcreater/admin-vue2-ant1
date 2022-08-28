@@ -22,7 +22,7 @@ const model = (config) => {
         findAll: function(){
             return axios.get(url_api);
         },
-        create: function(attrib){
+        create: (attrib) => {
             return axios.post(url_api, attrib);
         },
         update: function(id, attrib){

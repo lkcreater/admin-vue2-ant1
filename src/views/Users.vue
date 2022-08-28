@@ -31,7 +31,7 @@
 								<div>USER ROLES</div>		
 							</template>
 
-							<CardUserRole @change="onChange"></CardUserRole>
+							<FormRoles></FormRoles>
 						</a-tab-pane>
 
 						<a-tab-pane key="3" >
@@ -57,7 +57,7 @@
 <script>
 import CardAuthorTable from '@/components/Cards/CardAuthorTable' ;
 import StepCreateUser from '@/components/Step/StepCreateUser';
-import CardUserRole from '@/components/Cards/CardUserRole';
+import FormRoles from '@/components/Forms/FormRoles';
 
 
 const table1Columns = [
@@ -177,23 +177,20 @@ const table1Data = [
     
 export default {
     components: {
-			CardAuthorTable,
-			StepCreateUser,
-			CardUserRole
-		},
-		data() {
-			return {
-				// Associating "Authors" table data with its corresponding property.
-				table1Data: table1Data,
-				// Associating "Authors" table columns with its corresponding property.
-				table1Columns: table1Columns,
-			}
-		},
-		 methods: {
-			onChange(val) {
-				console.log('val == ', val);
-			},
-		},
+		CardAuthorTable,
+		StepCreateUser,
+		FormRoles
+	},
+	data() {
+		return {
+			// Associating "Authors" table data with its corresponding property.
+			table1Data: table1Data,
+			// Associating "Authors" table columns with its corresponding property.
+			table1Columns: table1Columns,
+		}
+	},
+	methods: {
+	},
 }
 </script>
 
