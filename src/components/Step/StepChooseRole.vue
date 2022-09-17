@@ -5,18 +5,21 @@
                 class="table-settings-notifications" 
                 :pagination="false"
                 :columns="columns" 
-                :data-source="data">
+                :data-source="data"
+                rowKey="id">
 
                 <template slot="action" slot-scope="text, record">
-                    <a-switch @change="onChange" />
+                    <a-switch @change="onChange" v-model="model[record.id]" :value="record.id" :data-name="record.name" />
                 </template>
 
             </a-table>
         </a-col>
+
     </a-row>
 </template>
 
 <script>
+
 const columns = [
     {
         title: 'Role',
@@ -31,44 +34,65 @@ const columns = [
         width: '15%',
         scopedSlots: { customRender: 'action' },
     },
-    {
-        title: 'View',
-        key: 'view',
-        width: '15%',
-        scopedSlots: { customRender: 'view' },
-    },
-];
-
-const data = [
-    {
-        key: '1',
-        name: 'Administrator',
-    },
-    {
-        key: '2',
-        name: 'Creator',
-    },
-    {
-        key: '3',
-        name: 'Read & Write',
-    },
-    {
-        key: '4',
-        name: 'Reader',
-    },
 ];
 
 export default {
     data() {
         return {
-            data,
+            data: [],
             columns,
+            model: [],
+            respons: [],
         };
     },
+    mounted () {
+        this.onProviderData();
+    },
     methods: {
-        onChange(checked) {
-            console.log(`a-switch to ${checked}`);
+        onProviderData(){
+            this.$models.role.findAll().then((res)=>{
+                if(res.status == 200){ 
+                    this.data = res.data.result;
+                }                         
+            })
+            .catch((err) => {
+                this.$notification.error({
+                    message: err.message,
+                    description: err.response.statusText,
+                });
+            });
         },
+        onChange(checked, e) {
+            const name = e.target.getAttribute('data-name');
+            const id = e.target.value;
+            if(checked == true){
+                this.respons.push({
+                    id: id,
+                    name: name
+                });
+            }else{
+                const index = this.respons.findIndex(item => item.id === id);
+                this.respons.splice(index, 1);
+            }
+            //console.log(this.respons);
+        },
+        onSubmitForm(){
+            if(this.respons.length == 0){
+                this.$notification.error({
+                    message: 'Alert Role',
+                    description: 'Please choose role',
+                });
+                return {
+                    status: 'error',
+                    models: []
+                }
+            }else{
+                return {
+                    status: 'process',
+                    models: this.respons
+                }
+            }
+        }
     },
 }
 </script>

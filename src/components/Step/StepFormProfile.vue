@@ -5,20 +5,7 @@
 
                 <a-row type="flex" justify="center">
                     <a-col span="8" >
-                        <div class="lk-preview-upload">
-                            <div class="lk-preview-image-file">
-                                <a-icon type="contacts" />
-                            </div>
-                            <a-upload
-                                list-type="picture"
-                                :show-upload-list="false"
-                                action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-                                :before-upload="beforeUpload"
-                                @change="handleChange"
-                                >
-                                <a-button> <a-icon type="upload" /> Upload </a-button>
-                            </a-upload>
-                        </div>
+                        <UploadProfile v-model="ruleForm.image"></UploadProfile>
                     </a-col>
                     <a-col span="16" >
                         <a-form-model-item has-feedback class="width-forminput" prop="firstname">
@@ -27,8 +14,8 @@
                             </a-input>
                         </a-form-model-item>
 
-                        <a-form-model-item has-feedback class="width-forminput" prop="lastname">
-                            <a-input type="text" size="small" placeholder="Surename" v-model="ruleForm.lastname" >
+                        <a-form-model-item has-feedback class="width-forminput" prop="surename">
+                            <a-input type="text" size="small" placeholder="Surename" v-model="ruleForm.surename" >
                                 <a-icon class="icon-color" slot="prefix" type="file-text" />
                             </a-input>
                         </a-form-model-item>
@@ -39,8 +26,8 @@
                             </a-input>
                         </a-form-model-item>
 
-                        <a-form-model-item has-feedback class="width-forminput" prop="tel">
-                            <a-input type="text" size="small" placeholder="Phone" v-model="ruleForm.tel" >
+                        <a-form-model-item has-feedback class="width-forminput" prop="phone">
+                            <a-input type="text" size="small" placeholder="Phone" v-model="ruleForm.phone" >
                                 <a-icon class="icon-color" slot="prefix" type="phone" />
                             </a-input>
                         </a-form-model-item>
@@ -73,86 +60,70 @@
 </template>
 
 <script>
-function getBase64(img, callback) {
-    const reader = new FileReader();
-    reader.addEventListener('load', () => callback(reader.result));
-    reader.readAsDataURL(img);
-}
+import UploadProfile from '@/components/Inputs/UploadProfile';
 
 export default {
+    components: {
+        UploadProfile
+    },
     data() {
+        let validateEmailAlready = async (rule, value, callback) => {
+            if (value != '') {
+                await this.$models.validate.usernameOrEmail({ email: value }).then((res)=>{                        
+                })
+                .catch((err) => {
+                    callback(new Error('Email already exists'));
+                }); 
+            }
+        };
+
         return {
-            loading: false,
-            imageUrl: '',
             ruleForm: {
                 image: '',
                 firstname: '',  
-                lastname: '', 
+                surename: '', 
                 email: '', 
-                tel: '',
+                phone: '',
                 birthday: '',
                 sex: ''               
             },
             rules: {
                 firstname: [{ required: true, trigger: 'blur' }],  
-                lastname: [{ required: true, trigger: 'blur' }], 
-                email: [{ required: true, trigger: 'blur' }, { pattern: '/^\S+@\S+\.\S+$/', message: 'Invalid email format message', trigger: 'change' }],    
-                tel: [{ required: true, trigger: 'blur' }],      
+                surename: [{ required: true, trigger: 'blur' }], 
+                email: [{ required: true, trigger: 'blur' }, { validator: validateEmailAlready, trigger: 'blur' }, { pattern: /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/, message: 'Invalid email format message', trigger: 'change' }],    
+                phone: [{ required: true, trigger: 'blur' }],      
                 birthday: [{ required: true, trigger: 'change' }],
-                sex: [{ required: true, trigger: 'blur' }]               
+                sex: [{ required: true, trigger: 'change' }]               
             }
         };
     },
     methods: {
-        handleChange(info) {
-            if (info.file.status === 'uploading') {
-                this.loading = true;
-                return;
-            }
-            if (info.file.status === 'done') {
-                // Get this url from response in real world.
-                getBase64(info.file.originFileObj, imageUrl => {
-                    this.imageUrl = imageUrl;
-                    this.loading = false;
-                });
-            }
+        async onSubmitForm() {       
+            try {
+                const valid = await this.$refs['formSubmit'].validate();      
+                if (valid) {                    
+                    return {
+                        status: 'process',
+                        models: this.ruleForm
+                    }
+                }    
+            } catch (error) {
+                if(error == false){
+                    return {
+                        status: 'error',
+                        models: []
+                    }
+                }
+            }             
         },
-        beforeUpload(file) {
-            const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-            if (!isJpgOrPng) {
-                this.$message.error('You can only upload JPG file!');
-            }
-
-            const isLt2M = file.size / 1024 / 1024 < 2;
-            if (!isLt2M) {
-                this.$message.error('Image must smaller than 2MB!');
-            }
-
-            return isJpgOrPng && isLt2M;
+        resetForm() {
+            this.$refs['formSubmit'].resetFields();
         },
     }
 }
 </script>
 
 <style scoped>
-    .lk-preview-upload{
-        float: right;
-        margin-right: 30px;
-        position: relative;
-        width: 200px;        
-    }
-    .lk-preview-image-file{   
-        min-height: 150px;
-        border-radius: 5px;
-        border: 1px dashed rgb(221, 221, 221);
-        background-color: rgb(245, 245, 245);
-        margin-bottom: 15px;
-    }
-    .lk-preview-image-file i.anticon{
-        margin-top: 15%;
-        font-size: 80px;
-        color: rgb(210, 210, 210);
-    }
     .width-forminput{
         width: 400px;
     }

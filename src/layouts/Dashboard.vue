@@ -30,12 +30,9 @@
 				<!-- / Layout Header's Conditionally Fixed Wrapper -->
 
 				<!-- Page Content -->
-				<a-layout-content>
-					<router-view v-slot="{ Component }">
-						<!-- Use any custom transition and fallback to `fade` -->
-						<transition :name="slide-right">
-							<component :is="Component" />
-						</transition>
+				<a-layout-content >
+					<router-view class="lk-content">
+						
 					</router-view>
 				</a-layout-content>
 				<!-- / Page Content -->
@@ -136,3 +133,15 @@
 	})
 
 </script>
+
+<style>
+	@keyframes slide-animate {
+		from {margin-top: 50px;  opacity: 0;}
+		to {margin-top: 0px; opacity: 1;}
+	}
+
+	.lk-content{
+		animation-name: slide-animate;
+  		animation-duration: 1s;
+	}
+</style>

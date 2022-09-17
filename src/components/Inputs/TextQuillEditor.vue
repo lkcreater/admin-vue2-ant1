@@ -14,7 +14,7 @@
                     class="ant-text-quill-editor" 
                     v-model="inputVal"
                     :options="quillOptions" 
-                    :style="{ height: height + 'px'}"
+                    :style="{ height: height + 'px', marginBottom: '45px'}"
                     >
                 </quill-editor>
             </a-col>
@@ -101,5 +101,9 @@ export default {
     color: rgb(0 0 0 / 32%);
     content: attr(data-placeholder);
     font-style: normal;
+    font-size: 14px;
+    font-weight: bold;
+    color: #cfcfcf;
+    letter-spacing: 1px;
 }
 </style>

@@ -137,6 +137,10 @@ const columns = [
 
 export default {
     props: {
+        isDetail: {
+            type: Boolean,
+            default: false,
+        },
         columns: {
             type: Array,
             default: () => columns,

@@ -1,163 +1,161 @@
 <template>
 	<div>
+        <CardTables
+            ref="CardTables"
+            :title="title"
+            :url="url"
+            :search-object="paramsObject">  
 
-		<!-- User Profile Card -->
-        <a-row style="margin-top: 20px" >
-            <a-col>
-                <a-card :bordered="false" class="header-solid h-full" :bodyStyle="{padding: '0px 0px 50px 0px'}">
-                    <template #title>
-                        <a-row type="flex" align="middle">	
-                            <a-col :span="24" :md="12">
-                                <h5 class="font-semibold m-0">Categories Table</h5>
-                            </a-col>
+            <!-- slot action -->
+            <template slot="action" >
+                <a-input-search 
+                    style="max-width: 300px; margin-right:15px"
+                    size="small" 
+                    placeholder="input search text" 
+                    @search="onSearch" />
 
-                            <a-col :span="24" :md="12" style="display: flex; align-items: center; justify-content: flex-end">
-                                <a-input-search placeholder="input search text" @search="onSearch" @keyup="onSearch($event.target.value)" style="max-width: 300px; margin-right:15px"/>
-                                <a-button type="dashed"  @click="btnCreateData">
-                                    Add category
-                                </a-button>
+                <a-button size="small" type="dashed" @click="onOpenForm(null)">
+                    <a-icon type="form" />
+                    Add category
+                </a-button>
+            </template>
+            <!-- slot action -->
+
+            <!-- slot table -->
+            <template  slot="table"  slot-scope="scope">            
+                <a-table
+                    row-key="id" 
+                    :columns="columns"                     
+                    :data-source="scope.data" 
+                    :pagination="scope.pagination"
+                    @change="scope.onChanepage">                             
+
+                    <p slot="expandedRowRender" slot-scope="record" style="margin: 0">
+                        <a-row>
+                            <a-col span="12">
+                                <a-descriptions title="Detail" :column="1" bordered>
+                                    <a-descriptions-item label="Title">
+                                        {{ record.title }}
+                                    </a-descriptions-item>
+                                    <a-descriptions-item label="Slug">
+                                        {{ record.slug }}
+                                    </a-descriptions-item>
+                                    <a-descriptions-item label="Create date">
+                                        {{ day(record.created_at) }}
+                                    </a-descriptions-item>
+                                    <a-descriptions-item label="Update date">
+                                        {{ day(record.updated_at) }}
+                                    </a-descriptions-item>
+                                    <a-descriptions-item label="Details">
+                                        {{ record.desc }}
+                                    </a-descriptions-item>
+                                </a-descriptions>    
                             </a-col>
-                        </a-row>
+                        </a-row>                                                
+                    </p>
+
+                    <template slot="createdAt" slot-scope="text, record">
+                        {{ day(text) }}
                     </template>
-                    
-                    <a-table 
-                        :columns="columns" 
-                        :data-source="data" 
-                        :rowKey="(record)=>record.id"                       
-                        >
 
-                        <div slot="action" slot-scope="record">
-                            <a-button type="dashed" size="small" style="margin-right: 5px" @click="btnEditData(record)">
-                                Edit
-                            </a-button> 
-                            <a-popconfirm title="Sure to delete?" @confirm="deleteItem(record)">
-                                <a-button type="danger" size="small" >
-                                    Del
-                                </a-button>
-                            </a-popconfirm>                                    
-                        </div>
+                    <template slot="updatedAt" slot-scope="text, record">
+                        {{ day(text) }}
+                    </template>
 
-                        <p slot="expandedRowRender" slot-scope="record" style="margin: 0">
-                            <a-row>
-                                <a-col span="12">
-                                    <a-card :bordered="false" class="header-solid h-full card-profile-information" :bodyStyle="{paddingTop: 0, paddingBottom: '16px' }" :headStyle="{paddingRight: 0}">
-                                        <template #title>
-                                            <h6 class="font-semibold m-0">{{ record.title }}</h6>
-                                        </template>
-                                        <a-descriptions :column="1">
-                                            <a-descriptions-item label="Slug">
-                                                {{ record.slug }}
-                                            </a-descriptions-item>
-                                            <a-descriptions-item label="Create date">
-                                                {{ record.created_at }}
-                                            </a-descriptions-item>
-                                            <a-descriptions-item label="Update date">
-                                                {{ record.updated_at }}
-                                            </a-descriptions-item>
-                                            <a-descriptions-item label="Details">
-                                                {{ record.desc }}
-                                            </a-descriptions-item>
-                                        </a-descriptions>                                    
-                                    </a-card> 
-                                </a-col>
-                            </a-row>
-                                                    
-                        </p>
+                    <div slot="action" slot-scope="record">
+                        <a-button type="dashed" size="small" style="margin-right: 5px" @click="onOpenForm(record)">
+                            <a-icon type="edit" />
+                            Edit
+                        </a-button> 
+                        <a-popconfirm title="Sure to delete?" @confirm="deleteItem(record.id)">
+                            <a-button type="danger" size="small" >
+                                <a-icon type="delete" />
+                                Del
+                            </a-button>
+                        </a-popconfirm>                                    
+                    </div>
+                </a-table>
+            </template>   
+            <!-- slot table -->
 
-                        <template slot="createdAt" slot-scope="text, record">
-                            {{ getFormateDate(text) }}
-                        </template>
+        </CardTables>                   
 
-                        <template slot="updatedAt" slot-scope="text, record">
-                            {{ getFormateDate(text) }}
-                        </template>
-
-                    </a-table>                              
-                    
-                </a-card>
-            </a-col>
-        </a-row>
-		
-		<!-- User Profile Card -->	
-
-        <form-category ref="idFormCategory" @create-success="onCreateSuccess" @update-success="onUpdateSuccess"></form-category>
+        <DrawerFormCategory 
+            ref="form-category" 
+            @success="onSuccess">
+        </DrawerFormCategory>
 	</div>
 </template>
 
 <script>
-import FormCategory from '@/components/Categorys/FormCategory';
+import CardTables from '@/components/Cards/CardTables';
+import DrawerFormCategory from '@/components/Categorys/DrawerFormCategory';
 import moment from 'moment';
+import * as Api from "@/apis/categoryApi"
 
 export default ({
     components: {
-        FormCategory
+        DrawerFormCategory,
+        CardTables,
     },
     data() {
         return {     
             columns: [
-                { title: 'Title', dataIndex: 'title', key: 'title', filtered: true, width: '50%' },
-                { title: 'Create date', dataIndex: 'created_at', key: 'created_at', scopedSlots: { customRender: 'createdAt' }, width: '17%' },
-                { title: 'Update date', dataIndex: 'updated_at', key: 'updated_at', scopedSlots: { customRender: 'updatedAt' }, width: '17%' },
-                { title: 'Action', dataIndex: '', key: 'x', scopedSlots: { customRender: 'action' }, width: '16%' },
+                { 
+                    title: 'Title', 
+                    dataIndex: 'title', 
+                    key: 'title', 
+                    filtered: true, 
+                    width: '50%' 
+                },
+                { 
+                    title: 'Create date', 
+                    dataIndex: 'created_at', 
+                    key: 'created_at', 
+                    width: '17%',
+                    scopedSlots: { customRender: 'createdAt' }  
+                },
+                { 
+                    title: 'Update date', 
+                    dataIndex: 'updated_at', 
+                    key: 'updated_at',
+                    width: '17%',
+                    scopedSlots: { customRender: 'updatedAt' },  
+                },
+                { 
+                    title: 'Action', 
+                    dataIndex: '', 
+                    key: 'x',  
+                    width: '16%',
+                    scopedSlots: { customRender: 'action' }, 
+                },
             ], 
-            data: [],  
-            backupData: [],   
-            dataUpdate: null      
+            url: Api.getUrl(),
+            title: 'Categories Table',
+            paramsObject: {}, 
         }
     },
-    mounted() {
-        this.getQueryData();
-    },
-    methods: {
-        async getQueryData(){
-            await this.$models.categorys.findAll().then((res)=>{
-                if(res.status == 200){ 
-                    this.data = res.data.result;
-                    this.backupData = this.data;
-                }                         
-            })
-            .catch((err) => {
-                this.$notification.error({
-                    message: err.message,
-                    description: err.response.statusText,
-                });
-            });
-        },
+    methods: {        
         onSearch(val){
-            if(val){
-                this.data = this.data.filter((obj) => {                
-                    return obj.title.toLowerCase().includes(val.trim().toLowerCase());
-                });
-            }else{
-                this.data = this.backupData;
+            this.paramsObject = {
+                title: val
             }
         },
-        deleteItem(obj){
-            alert('del');
+        onOpenForm(items){
+            this.$refs['form-category'].openForm(items);
         },
-        btnCreateData(){
-            this.dataUpdate = null;
-            this.$refs.idFormCategory.aDrawerShow(this.dataUpdate);
+        async deleteItem(id){
+            const respone = await Api.del(id);
+            if(respone.status == 200){
+                this.$refs['CardTables'].reload();
+            }
         },
-        btnEditData(Object){
-            this.dataUpdate = Object;
-            this.$refs.idFormCategory.aDrawerShow(this.dataUpdate);
+        onSuccess(){
+            this.$refs['CardTables'].reload();
         },
-        onCreateSuccess(item){
-            // this.data.unshift(item);
-            this.backupData.unshift(item);
-        },
-        getFormateDate(date){
+        day(date){
             return moment(date).format("MMMM Do YYYY, h:mm a");
         },
-        onUpdateSuccess(item){
-            this.backupData = this.backupData.map((ele) => {
-                if(ele.id === item.id){
-                    return item;
-                }
-                return ele;                
-            });
-        }
     },
 });
 </script>

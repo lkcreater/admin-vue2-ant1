@@ -37,9 +37,9 @@ let routes = [
 	},
 	{
 		path: '/posts/form',
-		name: 'FormPost',
+		name: 'Form',
 		layout: "dashboard",
-		component: () => import('../views/FormPost.vue'),
+		component: () => import('../views/PostFormInput.vue'),
 	},
 	{
 		path: '/users',
@@ -58,6 +58,12 @@ let routes = [
 		name: 'Tables',
 		layout: "dashboard",
 		component: () => import('../views/Tables.vue'),
+	},
+	{
+		path: '/test',
+		name: 'Test',
+		layout: "dashboard",
+		component: () => import('../views/Test.vue'),
 	},
 	{
 		path: '/billing',
@@ -86,7 +92,14 @@ let routes = [
 	{
 		path: '/sign-in',
 		name: 'Sign-In',
+		layout: "login",
 		component: () => import('../views/Sign-In.vue'),
+	},
+	{
+		path: '/login',
+		name: 'Login',
+		layout: "login",
+		component: () => import('../views/Login.vue'),
 	},
 	{
 		path: '/sign-up',

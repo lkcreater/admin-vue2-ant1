@@ -14,18 +14,20 @@
             </a-steps>
 
             <div class="steps-content">
-                <component v-if="steps[current].component != null" :is="steps[current].component" :ref="steps[current].component"></component>            
+                <StepUserPassword  v-show="current == 0" ref="StepUserPassword"/> 
+                <StepFormProfile v-show="current == 1" ref="StepFormProfile"/> 
+                <StepChooseRole v-show="current == 2" ref="StepChooseRole"/> 
+                <StepFinish v-show="current == 3" ref="StepFinish" :data="dataFinish" :is-done="isDone" @reload="reload"/>        
             </div>
 
-            <div class="steps-action">
+            <div v-if="isDone == false" class="steps-action">
                 <a-button v-if="current < steps.length - 1" type="primary" @click="next">
                     Next
                 </a-button>
                 <a-button
                     v-if="current == steps.length - 1"
                     type="primary"
-                    @click="$message.success('Processing complete!')"
-                    >
+                    @click="onSubmit">
                     Done
                 </a-button>
                 <a-button v-if="current > 0" style="margin-left: 8px" @click="prev">
@@ -49,10 +51,35 @@ export default {
         StepChooseRole,
         StepFinish
     },
+    computed: {
+        dataFinish(){
+            return { ...this.model.step_1,  ...this.model.step_2, ...this.model.step_3 }
+        } 
+    },
     data() {
         return {
             current: 0,
             status: 'process',
+            isDone: false,
+            model: {
+                step_1: {
+                    username: '',
+                    passeord: '',
+                    repassword: ''
+                },
+                step_2: {
+                    image: '',
+                    firstname: '',
+                    surename: '',
+                    email: '',
+                    phone: '',
+                    birthday: '',
+                    sex: ''
+                },
+                step_3: {
+                    role: []
+                }
+            },
             steps: [
                 {
                     title: 'First',
@@ -84,34 +111,76 @@ export default {
         }
     },
     methods: {
+        reload(){
+            this.$emit('reload');
+        },
+        async onSubmit(){
+            let attribs = { ...this.model.step_1,  ...this.model.step_2, ...this.model.step_3 };
+            await this.$models.auth.register(attribs).then((res)=>{
+                if(res.status == 200){
+                    this.$message.success('Processing complete!');
+                    this.isDone = true;
+                    //console.log(res.data);
+                }                         
+            })
+            .catch((err) => {
+                this.$notification.error({
+                    message: err.message,
+                    description: err.response.statusText,
+                });
+            }); 
+        },
         next() {
-
             // step 1
-            // if(this.current == 0){
-            //     this.AppStep().first();
-            // }else if(this.current == 1){
-            //     this.AppStep().second();
-            // }
-            this.current++;
+            if(this.current == 0){
+                this.AppStep().first();
+            }
 
-            
+            // step 2
+            if(this.current == 1){
+                this.AppStep().second();                        
+            }
 
+            // step 3
+            if(this.current == 2){
+                this.AppStep().third();
+            }
         },
         prev() {
             this.current--;
         },
         AppStep(){
-            let keyRefsId = this.steps[this.current].component;
             return {
                 first: async () => {         
-                    const { status, models } = await this.$refs[keyRefsId].onSubmitForm();  
+                    const { status, models } = await this.$refs['StepUserPassword'].onSubmitForm();  
                     this.status = status;
-                    if(this.status == 'process'){
+                    if(this.status == 'process' && status == 'process'){
+                        // set model
+                        this.model.step_1 = {
+                            username: models.user,
+                            password: models.pass,
+                            repassword: models.checkPass
+                        }
+                        this.current++                    
+                    }
+                },
+                second: async () => {
+                    const { status, models } = await this.$refs['StepFormProfile'].onSubmitForm();  
+                    this.status = status;
+                    if(this.status == 'process' && status == 'process'){
+                        // set model
+                        this.model.step_2 = models;
                         this.current++
                     }
                 },
-                second: () => {
-
+                third: async () => {
+                    const { status, models } = await this.$refs['StepChooseRole'].onSubmitForm();  
+                    this.status = status;
+                    if(this.status == 'process' && status == 'process'){
+                        // set model
+                        this.model.step_3.role = models;
+                        this.current++
+                    }
                 }
             }
         }

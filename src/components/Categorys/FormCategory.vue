@@ -75,19 +75,17 @@
                 </a-col>
             </a-row>
         
-            <div
-                :style="{
-                position: 'absolute',
-                right: 0,
-                bottom: 0,
-                width: '100%',
-                borderTop: '1px solid #e9e9e9',
-                padding: '10px 16px',
-                background: '#fff',
-                textAlign: 'right',
-                zIndex: 1,
-                }"
-            >
+            <div :style="{
+                    position: 'absolute',
+                    right: 0,
+                    bottom: 0,
+                    width: '100%',
+                    borderTop: '1px solid #e9e9e9',
+                    padding: '10px 16px',
+                    background: '#fff',
+                    textAlign: 'right',
+                    zIndex: 1,
+                }" >
                 <a-popconfirm
                     title="Are you sure cancel?"
                     ok-text="Yes"

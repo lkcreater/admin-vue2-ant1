@@ -2,11 +2,100 @@
     background-color: #b1f5bd;
 }
 
-hr.gradient-line {
-        margin: 15px 0;
-        border: none;
-        height: 1px;
-        background-color: #f5f5f5;
-        background-image: linear-gradient(90deg,transparent,rgba(0,0,0,.4),transparent);
-        opacity: .25;
+/* form design */
+.lk-form-custom{
+    .lk-col-r24{
+        padding-right: 24px; 
     }
+
+    .lk-col-left{
+        .ant-form-item{
+            padding-right: 24px; 
+        }
+    }
+
+    .ant-form-item,
+    .ant-form-item-label{
+        margin-bottom: 0px;
+        
+        label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #141414;
+        }
+    } 
+}
+
+/* input tags */
+.lk-input-tags {
+    .ant-form-item-control{
+        line-height: 32px !important;
+    }
+
+    .ant-select {
+        .ant-select-selection--multiple {
+            padding: 8px 10px;
+        }
+
+        .ant-select-selection__choice__remove i {
+            color: #fff;
+            height: 16px;
+            border-left: 1px solid hsla(0,0%,100%,.3);
+            padding-left: 5px;
+            padding-top: 2px;
+            opacity: .75;
+        }
+
+        .ant-select-selection__rendered>ul>li:not(.ant-select-search) {
+            border-radius: 20px;
+            padding: 2px 27px 2px 10px;
+            font-size: 12px;
+            font-weight: 500;
+            margin-right: 3.75px;
+            margin-bottom: 3.75px;
+            background-color: #3a416f;
+            border: 1px solid #3a416f;
+            color: #fff;
+            line-height: 2;
+            height: 30px;
+        }
+    }
+}
+
+/* upload list */
+.lk-upload-list{
+    .ant-upload-list{
+        padding: 10px;
+        border: 1px dashed #d9d9d9;
+        margin-top: 15px;
+        height: 130px;
+        overflow: auto;
+    }
+}
+
+/* gallery list */
+.lk-gallery-list{
+    padding-top: 10px;
+    min-height: 60px;
+
+    .ant-avatar:first-child{
+        margin-left: 0;
+    }
+    .ant-avatar:last-child{
+        margin-right: 0;
+    }
+    .ant-avatar{
+        margin: 0 5px;
+    }
+}
+
+hr.gradient-line {
+    margin: 15px 0;
+    border: none;
+    height: 1px;
+    background-color: #f5f5f5;
+    background-image: linear-gradient(90deg,transparent,rgba(0,0,0,.4),transparent);
+    opacity: .25;
+}
+
+

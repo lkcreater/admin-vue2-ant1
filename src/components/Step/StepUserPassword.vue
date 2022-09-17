@@ -32,14 +32,20 @@
 </template>
 
 <script>
+import { async } from 'q';
+
 export default {
     data() {
 
-        let validateUser = (rule, value, callback) => {
+        let validateUser = async (rule, value, callback) => {
             if (value === '') {
                 callback(new Error('Please input the Username'));
             } else {
-                callback();
+                await this.$models.validate.usernameOrEmail({ username: value }).then((res)=>{                        
+                })
+                .catch((err) => {
+                    callback(new Error('Username already exists'));
+                }); 
             }
         };
         
@@ -71,7 +77,7 @@ export default {
                 checkPass: '',                
             },
             rules: {
-                user: [{ validator: validateUser, trigger: 'change' }, { min: 4, message: 'Length should min 4', trigger: 'change' }],
+                user: [{ validator: validateUser, trigger: 'blur' }, { min: 4, message: 'Length should min 4', trigger: 'change' }],
                 pass: [{ validator: validatePass, trigger: 'change' }, { min: 4,  message: 'Length should be min 4', trigger: 'change' }],
                 checkPass: [{ validator: validatePassConfirm, trigger: 'change' }, { min: 4, message: 'Length should min 4', trigger: 'change' }],
             },

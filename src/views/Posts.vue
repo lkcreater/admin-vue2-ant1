@@ -188,7 +188,7 @@ export default {
                     pagination.pageSize = meta.limit;
                     this.pagination = pagination;
 
-                    //console.log(this.dataModels);
+                    console.log(this.dataModels);
                 }                         
             })
             .catch((err) => {
