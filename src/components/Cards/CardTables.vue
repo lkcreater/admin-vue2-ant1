@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { Api } from "@/apis/api";
+import http from "@/apis/api";
 
 export default ({
     props: {
@@ -84,9 +84,9 @@ export default ({
             });
 
             // call api
-            const respone = await Api(this.method, `${this.url}?${params}`, { 
+            const respone = await http.Api(this.method, `${this.url}?${params}`, { 
                 params: { page: this.currentPage } 
-            });
+            }, true);
             if(respone.status == 200){
 
                 // setup utility after call api
@@ -112,7 +112,7 @@ export default ({
             }
         },
         handleTableChangePage(pagination, filters, sorter) {
-            console.log('page', pagination)
+            //console.log('page', pagination)
             if(this.page){
                 const pager = { ...this.pagination };
                 pager.current = pagination.current;
@@ -130,3 +130,9 @@ export default ({
     },
 })
 </script>
+
+<style>
+ul.ant-pagination.ant-table-pagination{
+    margin-right: 70px !important;
+}
+</style>

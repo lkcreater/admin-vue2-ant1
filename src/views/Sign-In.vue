@@ -27,13 +27,13 @@
 					</a-form-item>
 
 					<a-form-item class="mb-5" label="Password" :colon="false">
-						<a-input type="password" v-model="model.password" placeholder="Password" :autofocus="checkForcus" >
+						<a-input type="password" v-model="model.password" placeholder="Password" >
 							<a-icon slot="prefix" type="lock" style="color: rgba(0,0,0,.45)" />						
 						</a-input>
 					</a-form-item>
 
 					<a-form-item class="mb-10">
-    					<a-switch v-model="rememberMe" /> Remember Me
+    					<a-switch v-model="model.rememberMe" /> Remember Me
 					</a-form-item>
 					<a-form-item>
 						<a-button type="primary" block html-type="submit" class="login-form-button">
@@ -60,50 +60,65 @@
 			<!-- Sign In Image Column -->
 
 		</a-row>
-		
 	</div>
 </template>
 
 <script>
-import moment from 'moment';
+import local from '@/plugins/LocalStorageDB';
 import * as Api from '@/apis/signInApi';
-const keyRemember = 'logapp:web-remember-application';
+import { mapGetters, mapMutations } from "vuex";
 
 export default ({
 	data() {
-		return {
-			visibleSignUpLink: false,
-			rememberMe: false,
+		return {			
+			visibleSignUpLink: false,			
 			model:{
 				username: '',
-				password: ''
+				password: '',
+				rememberMe: false,
 			}
 		}
 	},
 	computed: {
 		checkForcus() {			
-			return (this.rememberMe == true) ? 'true' : 'false';
-		}
+			return (this.model.rememberMe == true) ? 'true' : 'false';
+		},
+		...mapGetters({
+			isAuthen : 'auth/isAuthen', 
+		}),
 	},
-	mounted () {
+ 	async mounted () {
+		this.SET_LOGOUT();
 		this.loadRemember();
-		// var admission = moment('18-09-2022', 'DD-MM-YYYY'); 
-		// var now = moment(moment(), 'DD-MM-YYYY').diff(admission, 'days');
-		// //console.log(moment(moment(), "DD-MM-YYYY").add(5, 'days').format("DD-MM-YYYY"));
-		// console.log(now);
 	},
 	methods: {
+		...mapMutations({
+			SET_AUTHEN : 'auth/SET_AUTHEN',
+			SET_LOGOUT : 'auth/SET_LOGOUT'
+		}),
 	 	async handleSubmit(e) {
 			e.preventDefault();
 			if(this.validate()){
 				const respone = await Api.signin(this.model);
 				if(respone.status == 200){
-					if(this.rememberMe){
+					if(this.model.rememberMe){
 						this.setRemember();
 					}else{
 						this.removeRemember();
 					}
-					console.log(respone);
+
+					// set local storage
+					local.setupAuthen(this.model.username, respone.data.accessToken);
+
+					this.SET_AUTHEN({
+						username: this.model.username,
+						token: respone.data.accessToken,
+						data: respone.data
+					});
+
+					if(this.isAuthen){
+						this.$router.replace({ path: '/' })
+					}
 				}
 			}			
 		},
@@ -129,26 +144,17 @@ export default ({
 		},
 		setRemember(){
 			if(this.model.username.length > 0){
-				localStorage.setItem(keyRemember, btoa(JSON.stringify({
-					username: this.model.username,
-					date: moment(moment(), "DD-MM-YYYY").add(5, 'days').format("DD-MM-YYYY")
-				})))				
+				local.setupRemember(this.model.username);			
 			}
 		},
 		removeRemember(){
-			if(localStorage.getItem(keyRemember)){
-				localStorage.removeItem(keyRemember);
-			}
+			local.removeRemember();
 		},
 		loadRemember(){
-			const remember = localStorage.getItem(keyRemember);
-			if(remember){
-				const items = JSON.parse(atob(remember));
-				if(items.username){
-					this.rememberMe = true;
-					this.model.username = items.username;
-				}
-			}
+			const { username, rememberMe } = local.loadRemember();			
+			
+			this.model.username = username;
+			this.model.rememberMe = rememberMe;
 		}
 	},
 })

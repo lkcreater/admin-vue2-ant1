@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import $store from '@/store';
 
 Vue.use(VueRouter)
 
@@ -45,7 +46,13 @@ let routes = [
 		path: '/users',
 		name: 'Users',
 		layout: "dashboard",
-		component: () => import('../views/Users.vue'),
+		component: () => import('../views/Users/UsersTable.vue'),
+	},
+	{
+		path: '/users/create',
+		name: 'Create User',
+		layout: "dashboard",
+		component: () => import('../views/Users/CreateUser.vue'),
 	},
 	{
 		path: '/layout',
@@ -144,6 +151,26 @@ const router = new VueRouter({
 			behavior: 'smooth',
 		}
 	}
+})
+
+router.beforeEach( async (to, from, next) => {
+	// CHECK 404 PAGE
+	if(to.matched[0].length > 0 && to.matched[0].path === '*'){
+		return next();
+	}
+
+	//CHECK AUTHEN
+	if(to.path !== '/sign-in'){
+		$store.commit('auth/SET_VERTIFY_AUTH');
+		if($store.getters['auth/isAuthen'] === false){
+
+			if($store.getters['auth/isLockScreen'] === false){
+				return next({ path : '/sign-in' });
+			}			
+		}				
+	}
+
+	next();
 })
 
 export default router

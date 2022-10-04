@@ -52,9 +52,9 @@
 </template>
 
 <script>
-import CardUsersList from '@/components/Cards/CardUsersList' ;
+import CardUsersList from '@/components/Users/CardUsersList' ;
 import StepCreateUser from '@/components/Step/StepCreateUser';
-import FormRoles from '@/components/Forms/FormRoles';
+import FormRoles from '@/components/Users/FormRoles';
     
 export default {
     components: {

@@ -21,7 +21,8 @@ import DashboardRTLLayout from './layouts/DashboardRTL.vue'
 import LoginLayout from './layouts/Login.vue'
 import router from './router'
 import models from './models';
-// import './plugins/click-away'
+import store from './store';
+//import './plugins/click-away'
 
 import './scss/app.scss';
 
@@ -38,5 +39,6 @@ Vue.component("layout-login", LoginLayout);
 
 new Vue({
   router,
+  store,
   render: h => h(App)
 }).$mount('#app')

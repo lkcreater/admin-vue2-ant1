@@ -45,11 +45,13 @@
                 @confirm="confirmCancel">
 
                 <a-button :style="{ marginRight: '8px' }" >
+                    <a-icon type="close" />
                     Cancel
                 </a-button>
             </a-popconfirm>
         
             <a-button type="primary" html-type="submit">
+                <a-icon type="form" />
                 Submit
             </a-button>
         </div>

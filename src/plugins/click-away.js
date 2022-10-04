@@ -6,6 +6,7 @@ import Vue from 'vue'
 let handleOutsideClick
 Vue.directive('click-away', {
 	bind (el, binding, vnode) {
+		//console.log('CLICK-AWAY +++++ ');
 		// Here's the click/touchstart handler
 		// (it is registered below)
 		handleOutsideClick = (e) => {

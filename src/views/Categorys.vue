@@ -154,7 +154,7 @@ export default ({
             this.$refs['CardTables'].reload();
         },
         day(date){
-            return moment(date).format("MMMM Do YYYY, h:mm a");
+            return moment(date).fromNow();
         },
     },
 });

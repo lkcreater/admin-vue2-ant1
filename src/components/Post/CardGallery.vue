@@ -7,6 +7,7 @@
                 <a-upload-dragger
                     class="lk-upload-dragger"
                     name="file"
+                    :headers="$store.getters['auth/setHeader']"
                     :multiple="true"
                     :show-upload-list="false"
                     :action="urlApi"

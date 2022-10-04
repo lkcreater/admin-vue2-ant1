@@ -65,6 +65,8 @@
 
 <script>
 import moment from 'moment';
+import * as Api from '@/apis/mediaApi';
+
 export default {
     props: {
         isDone: {
@@ -93,7 +95,7 @@ export default {
             return moment(day).format("MMM Do YY");
         },
         image(item){            
-            return (typeof item == 'object') ? this.$models.url(item.url) : '';
+            return (typeof item == 'object') ? Api.getUrl(item.url) : '';
         },
         role(item){
             let data = [];

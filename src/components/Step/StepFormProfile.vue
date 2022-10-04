@@ -61,6 +61,7 @@
 
 <script>
 import UploadProfile from '@/components/Inputs/UploadProfile';
+import * as Api from "@/apis/userApi";
 
 export default {
     components: {
@@ -68,13 +69,21 @@ export default {
     },
     data() {
         let validateEmailAlready = async (rule, value, callback) => {
-            if (value != '') {
-                await this.$models.validate.usernameOrEmail({ email: value }).then((res)=>{                        
-                })
-                .catch((err) => {
-                    callback(new Error('Email already exists'));
-                }); 
-            }
+            if (value !== '') {
+                const respone = await Api.validate({
+                    field: 'email',
+                    value: value
+                });
+                if(respone.status == 200){
+                    if(respone.data.isHas === true){
+                        callback(new Error('Email already exists'));
+                    }else{
+                        callback();
+                    }
+                }else{
+                    callback(new Error(`Error code : ${respone.status}`));
+                }            
+            }          
         };
 
         return {

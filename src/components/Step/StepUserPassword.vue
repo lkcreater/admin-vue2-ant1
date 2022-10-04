@@ -7,20 +7,20 @@
             <div style="padding-top: 10px; margin-bottom:70px">
                 <a-form-model ref="formUsernamePassword" :model="ruleForm" :rules="rules" v-bind="layout">
 
-                    <a-form-model-item has-feedback prop="user">
-                        <a-input size="small" v-model="ruleForm.user" type="text" autocomplete="off" placeholder="Username">
+                    <a-form-model-item has-feedback prop="username">
+                        <a-input size="small" v-model="ruleForm.username" type="text" autocomplete="off" placeholder="Username">
                             <a-icon slot="prefix" type="user" style="color:rgba(0,0,0,.25)" />
                         </a-input>
                     </a-form-model-item>
 
-                    <a-form-model-item has-feedback prop="pass">
-                        <a-input size="small" v-model="ruleForm.pass" type="password" autocomplete="off" placeholder="password">
+                    <a-form-model-item has-feedback prop="password">
+                        <a-input size="small" v-model="ruleForm.password" type="password" autocomplete="off" placeholder="password">
                             <a-icon slot="prefix" type="lock" style="color:rgba(0,0,0,.25)" />
                         </a-input>
                     </a-form-model-item>
 
-                    <a-form-model-item has-feedback prop="checkPass">
-                        <a-input size="small" v-model="ruleForm.checkPass" type="password" autocomplete="off" placeholder="Confirm Password">
+                    <a-form-model-item has-feedback prop="repassword">
+                        <a-input size="small" v-model="ruleForm.repassword" type="password" autocomplete="off" placeholder="Confirm Password">
                             <a-icon slot="prefix" type="lock" style="color:rgba(0,0,0,.25)" />
                         </a-input>
                     </a-form-model-item>
@@ -32,38 +32,32 @@
 </template>
 
 <script>
-import { async } from 'q';
+import * as Api from "@/apis/userApi";
 
 export default {
-    data() {
-
-        let validateUser = async (rule, value, callback) => {
+    data() {   
+        let validateUserExists = async (rule, value, callback) => {
             if (value === '') {
                 callback(new Error('Please input the Username'));
             } else {
-                await this.$models.validate.usernameOrEmail({ username: value }).then((res)=>{                        
-                })
-                .catch((err) => {
-                    callback(new Error('Username already exists'));
-                }); 
-            }
-        };
-        
-        let validatePass = (rule, value, callback) => {
-            if (value === '') {
-                callback(new Error('Please input the Password'));
-            } else {
-                if (this.ruleForm.checkPass !== '') {
-                    this.$refs['formUsernamePassword'].validateField('checkPass');
-                }
-                callback();
+                const respone = await Api.validate({
+                    field: 'username',
+                    value: value
+                });
+                if(respone.status == 200){
+                    if(respone.data.isHas === true){
+                        callback(new Error('Username already exists'));
+                    }else{
+                        callback();
+                    }
+                }else{
+                    callback(new Error(`Error code : ${respone.status}`));
+                }            
             }
         };
 
         let validatePassConfirm = (rule, value, callback) => {
-            if (value === '') {
-                callback(new Error('Please input the password again'));
-            } else if (value !== this.ruleForm.pass) {
+            if (value !== this.ruleForm.password) {
                 callback(new Error("Two inputs don't match!"));
             } else {
                 callback();
@@ -72,14 +66,25 @@ export default {
 
         return {
             ruleForm: {
-                user: '',
-                pass: '',
-                checkPass: '',                
+                username: '',
+                password: '',
+                repassword: '',                
             },
             rules: {
-                user: [{ validator: validateUser, trigger: 'blur' }, { min: 4, message: 'Length should min 4', trigger: 'change' }],
-                pass: [{ validator: validatePass, trigger: 'change' }, { min: 4,  message: 'Length should be min 4', trigger: 'change' }],
-                checkPass: [{ validator: validatePassConfirm, trigger: 'change' }, { min: 4, message: 'Length should min 4', trigger: 'change' }],
+                username: [
+                    { required: true, trigger: 'blur' },                    
+                    { min: 4, message: 'Length should min 4', trigger: 'change' },
+                    { validator: validateUserExists, trigger: 'blur' }, 
+                ],
+                password: [
+                    { required: true, trigger: 'blur' },
+                    { min: 4,  message: 'Length should be min 4', trigger: 'change' }
+                ],
+                repassword: [
+                    { required: true, trigger: 'blur' },
+                    { validator: validatePassConfirm, trigger: 'change' }, 
+                    { min: 4, message: 'Length should min 4', trigger: 'change' },                    
+                ],
             },
             layout: {
                 labelCol: { span: 4 },

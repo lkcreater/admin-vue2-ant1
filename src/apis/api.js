@@ -1,8 +1,7 @@
 import axios from "axios";
 import Vue from "vue";
-import a from "vue";
-
-var vm = new Vue()
+import router from '@/router';
+import $store from '@/store';
 
 const textErrorRender = (err) => {
     let text = '';
@@ -15,30 +14,49 @@ const textErrorRender = (err) => {
     return text;
 }
 
-export const hostname = 'http://localhost:3000';
-
-export async function Api(method, url, data={}, auth=false){
-    const headers = {}
-
+const getHeader = (auth) => {
+    const headers = {};
     if(auth){
-        headers['auth'] = 'token';
+        const token = $store.getters['auth/token'];
+        if(token == ''){
+            router.replace({ path: '/sign-in' });
+            return false;
+        }
+        headers[ $store.getters['auth/keyHeader'] ] = token;
     }
+    return headers
+}
 
+const api = {
+    HOST_API_URL: 'http://localhost:3000'
+}
+
+api.Api = async (method, url, data={}, auth=false, checkAuth=true) => {
     try {
-        const respone = await axios({
+        const header = getHeader(auth);       
+
+        return await axios({
             method: method,
             url: url,
             data: data,
-            headers: headers
+            headers: header
         });
-
-        return respone;
     } catch (err) {
-        Vue.prototype.$notification['error']({
-            message: `${err.response.statusText} (${err.response.status})`,
-            description: textErrorRender(err),
-        });
+        if(checkAuth){
+            if(err.response.status == 401){
+                const code401 = err.response.data?.code || false;
+                if(code401 === 'TOKEN_EXPIRED_ERR'){
+                    router.replace({ path: '/sign-in' });
+                }
+            }        
+
+            Vue.prototype.$notification['error']({
+                message: `${err.response.statusText} (${err.response.status})`,
+                description: textErrorRender(err),
+            });
+        }
         return err.response
     }
 }
 
+export default api;

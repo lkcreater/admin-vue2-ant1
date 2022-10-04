@@ -3,15 +3,55 @@
         class="lk-form-custom"
         ref="formRules"
         :model="form"
-        :rules="rules">
+        :rules="rules"
+        @submit="handleSubmit" 
+        @submit.native.prevent>
+
+        <a-row style="margin-bottom: 12px;">
+            <a-col :span="12">
+                <a-row type="flex" justify="start" >
+                    <a-col style="padding-left: 12px;">
+                        <a-button type="dashed" @click="$router.push({ path: '/posts' })">
+                            <a-icon type="arrow-left" />
+                            Back to Posts
+                        </a-button>
+                    </a-col>
+                </a-row>
+            </a-col>
+            <a-col :span="12">
+                <a-row type="flex" justify="end" >
+                    <a-col style="padding-right: 12px;">      
+                        <a-popconfirm
+                            title="Are you sure cancel?"
+                            ok-text="Yes"
+                            cancel-text="No"
+                            @confirm="confirmCancelForm">
+
+                            <a-button type="dashed" :style="{ marginRight: '8px' }" >
+                                <a-icon type="close" />
+                                Cancel
+                            </a-button>
+                        </a-popconfirm>
+                    
+                        <a-button type="primary" html-type="submit">
+                            <a-icon type="form" />
+                            Submit
+                        </a-button>
+                    </a-col>
+                </a-row>
+            </a-col>
+        </a-row>
+        
 
         <a-row>
             <a-col :md="8" :sm="24" style="padding: 0 12px;">
-                <CardImageInput
-                    v-model="form.image"
-                    :edit-file="true"
-                    title="Post Image">
-                </CardImageInput>
+                <a-form-model-item :colon="false" prop="image">
+                    <CardImageInput
+                        v-model="form.image"
+                        :edit-file="true"
+                        title="Post Image">
+                    </CardImageInput>
+                </a-form-model-item>
 
                 <div style="margin-top: 24px;">
                     <CardChooseCate v-model="form.categorys">                    
@@ -77,6 +117,7 @@
                     <a-row>
                         <a-col style="padding-top: 5px;">
                             <InputTagsSelect
+                                v-model="form.tags"
                                 placeholder="please enter tags">
                             </InputTagsSelect>
                         </a-col>
@@ -90,13 +131,13 @@
                             <CardGallery v-model="form.gallery"></CardGallery>
                         </a-col>
                         <a-col :span="12">
-                            <CardAttachment></CardAttachment>
+                            <CardAttachment v-model="form.files"></CardAttachment>
                         </a-col>
                     </a-row>                                      
                 </div>
 
             </a-col>
-        </a-row>
+        </a-row>        
 
     </a-form-model>
 </template>
@@ -109,13 +150,14 @@ import CardGallery from '@/components/Post/CardGallery';
 import CardAttachment from '@/components/Post/CardAttachment';
 import TextQuillEditor from '@/components/Inputs/TextQuillEditor';
 import moment from 'moment';
+import * as Api from '@/apis/postApi';
 
 var initForm = function() {
     return {
         image: '',
         title: '',
         slug: '',
-        public_date_at: '',
+        public_date_at: moment(),
         content: '',
         content_excerpt: '',
         categorys: [],
@@ -124,6 +166,7 @@ var initForm = function() {
         files: [],        
     }
 }
+
 export default {
     components: {
         CardImageInput,
@@ -138,23 +181,64 @@ export default {
             return 'Post Information'
         }
     }, 
-    mounted () {
-        this.startSetupForm();
-    },  
     data(){
         return {
+            editModel: null,
             form: initForm(),
-            rules: {}
+            rules: {
+                title: [
+                    { required: true, trigger: 'blur' },
+                ],
+                image: [
+                    { required: true, trigger: 'blur' },
+                ],
+            }
         }
     },
     methods: {
-        startSetupForm() {
-            this.form.public_date_at = moment()
+        async onSubmitApi(){
+            if(this.editModel){
+                // update record
+                const respone = await Api.update(this.editModel.id, this.form);
+
+                if(respone.status == 200){
+                    this.$notification['success']({
+                        class: 'noti-custom-success',
+                        message: 'Notification Form',
+                        description: `The Update Submit successfully.`,
+                    });
+                    this.$router.replace({ path: '/posts' });
+                }
+            }else{
+                // new record
+                const respone = await Api.add(this.form);
+
+                if(respone.status == 200){
+                    this.$notification['success']({
+                        message: 'Notification Form',
+                        description: `The Submit successfully.`,
+                    });
+                    this.$router.replace({ path: '/posts' });
+                }
+            }            
+        },
+        handleSubmit(e){
+            e.preventDefault();
+            this.$refs.formRules.validate(valid => {
+                if (valid) {
+                    this.onSubmitApi();
+                } else {
+                    return false;
+                }
+            });
+            //console.log(this.form);
+        },
+        confirmCancelForm(){
+            this.resetForm();
+        },
+        resetForm(){
+            Object.assign(this.form, initForm());
         }
     },
 }
 </script>
-
-<style lang="scss" scoped>
-
-</style>

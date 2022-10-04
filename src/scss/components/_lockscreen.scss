@@ -1,0 +1,91 @@
+.lk-widget-lockscreen {
+    .ant-modal-mask{
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+    }
+
+    .ant-modal-content{
+        border-radius: 20px;
+        box-shadow: 0 17px 50px #00000066;
+        background: rgb(233,244,119);
+        background: linear-gradient(120deg, rgba(250,250,250,1) 50%, rgba(24,144,255,1) 50%);
+
+        .ant-modal-body{
+            text-align: center;
+
+            .lk-lock-block-logout{
+                position: absolute;
+                right: 15px;
+                top: 15px;
+
+                .ant-btn-primary{
+                    background-color: #1d1d1d36;
+                    padding-left: 4px;
+
+                    .anticon{
+                        font-size: 15px;
+                    }
+                }
+            }
+
+            .lk-lock-title{
+                color: #00000052;
+                letter-spacing: 8px;
+                margin: 20px;
+            }
+
+            .ant-avatar{
+                border: 5px solid #fff;
+                box-shadow: 0 4px 6px #00000036;
+                margin-bottom: 25px;
+            }
+
+            button.ant-btn{
+                border: 1px solid #fff;
+                background-color: #58b1ff;
+                color: #000;
+            }
+
+            button.ant-btn:hover{
+                color: #fff;
+                background-color: #58b1ff;
+                box-shadow: 0 4px 6px #00000036;
+            }
+
+            .ant-form-item{
+                margin-bottom: 15px;
+
+                .has-error {
+                    .ant-form-explain {
+                        display: none;
+                    }
+
+                    .anticon{
+                        color: #661519 !important;
+                    }
+
+                    input{
+                        background-color: #ffe0e0;
+                        border: 1px solid #f5222d;
+                    }
+
+                    input::placeholder {
+                        color: rgb(150, 48, 48);
+                    }
+                }                
+
+                .ant-input-affix-wrapper .ant-input-prefix {
+                    left: 30%;
+                }
+
+                input {
+                    text-align: center;
+                    box-shadow: 0 4px 6px #00000036;
+                }
+            }
+        }
+    }
+}
+
+// background: rgb(233,244,119);
+// background: linear-gradient(125deg, rgba(233,244,119,1) 0%, rgba(119,244,192,1) 29%, rgba(24,144,255,1) 63%, rgba(105,5,255,1) 94%);

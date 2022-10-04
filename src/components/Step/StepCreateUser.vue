@@ -1,5 +1,5 @@
 <template>
-    <a-card :bordered="false" class="header-solid h-full" :bodyStyle="{padding: '0 0 50px 0' }">
+    <a-card :bordered="false" class="header-solid h-full" >
         <template #title>
             <a-row type="flex" align="middle">
                 <a-col :span="24" >
@@ -8,8 +8,8 @@
             </a-row>
         </template>
 
-        <div style="margin-top: 20px; padding: 0 100px;">
-            <a-steps :current="current" :status="status" style="margin-top: 50px">
+        <div style="padding: 0 15px;">
+            <a-steps :current="current" :status="status">
                 <a-step v-for="item in steps" :key="item.title" :title="item.title" :sub-title="item.subTitle" :description="item.description" />
             </a-steps>
 
@@ -43,6 +43,7 @@ import StepUserPassword from '@/components/Step/StepUserPassword';
 import StepFormProfile from '@/components/Step/StepFormProfile';
 import StepChooseRole from '@/components/Step/StepChooseRole';
 import StepFinish from '@/components/Step/StepFinish';
+import * as Api from '@/apis/userApi'
 
 export default {
     components: {
@@ -83,27 +84,27 @@ export default {
             steps: [
                 {
                     title: 'First',
-                    subTitle: 'Left 00:00:08',
-                    description: 'create username and password',
+                    subTitle: '',
+                    description: 'Setup username and password',
                     component: 'StepUserPassword',
                     data: []
                 },
                 {
                     title: 'Second',
-                    subTitle: 'Left 00:00:08',
-                    description: 'fill in personal information',
+                    subTitle: '',
+                    description: 'Fill in personal information',
                     component: 'StepFormProfile',
                     data: []
                 },
                 {
                     title: 'Third',
-                    subTitle: 'Left 00:00:08',
-                    description: 'choose a role',
+                    subTitle: '',
+                    description: 'Choose a role',
                     component: 'StepChooseRole',
                 },
                 {
                     title: 'Last',
-                    subTitle: 'Left 00:00:08',
+                    subTitle: '',
                     description: 'Finish',
                     component: 'StepFinish',
                 },
@@ -116,19 +117,12 @@ export default {
         },
         async onSubmit(){
             let attribs = { ...this.model.step_1,  ...this.model.step_2, ...this.model.step_3 };
-            await this.$models.auth.register(attribs).then((res)=>{
-                if(res.status == 200){
-                    this.$message.success('Processing complete!');
-                    this.isDone = true;
-                    //console.log(res.data);
-                }                         
-            })
-            .catch((err) => {
-                this.$notification.error({
-                    message: err.message,
-                    description: err.response.statusText,
-                });
-            }); 
+            console.log(attribs);
+            const respone = await Api.create(attribs); 
+            if(respone.status == 200){
+                this.$message.success('Processing complete!');
+                this.isDone = true;
+            }
         },
         next() {
             // step 1
@@ -157,9 +151,9 @@ export default {
                     if(this.status == 'process' && status == 'process'){
                         // set model
                         this.model.step_1 = {
-                            username: models.user,
-                            password: models.pass,
-                            repassword: models.checkPass
+                            username: models.username,
+                            password: models.password,
+                            repassword: models.repassword
                         }
                         this.current++                    
                     }

@@ -29,4 +29,18 @@
 		color: $color-gray-12;
 	}
 }
+
+
+#layout-login{
+	position: absolute;
+	padding-top: 120px;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	overflow: auto;
+
+	//background: rgb(255,255,255);
+	background: linear-gradient(125deg, rgba(255,255,255,1) 53%, $color-primary 53%);  
+}
 // / Sign In Page

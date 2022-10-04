@@ -1,0 +1,88 @@
+.layout-dashboard {
+    .ant-layout-sider.sider-primary.ant-layout-sider-dark.lk-sidebar-design{
+        background-color: #006fa0 !important;
+
+        .ant-menu-item,
+        .ant-menu-submenu {
+            .router-link-active {
+                background-color: #0092d3;
+                box-shadow: none;
+
+                .icon{
+                    background-color: #1ab9ff !important;
+                    box-shadow: 0px 4px 6px #0000001f;
+                }
+            }
+
+            .icon{
+                background-color: #1585b6 !important;
+                padding: 5px;
+                color: #fff;
+            }
+
+            .anticon{
+                color: #fff;
+                font-size: 18px;
+                margin-right: 0px;
+            }
+        }
+
+        .ant-menu-submenu {
+            .ant-menu-inline{
+                margin-top: 8px;
+                border-radius: 8px;
+                background-color: #00000015;
+            }
+
+            .ant-menu-item::before{
+                content: "";
+                position: absolute;
+                left: 30px;
+                top: 53%;
+                transform: translateY(-50%);
+                height: 5px;
+                width: 5px;
+                border-radius: 1.5rem;
+                background: rgb(255, 255, 255);
+            }
+            .ant-menu-item.ant-menu-item-selected::before{
+                left: 28px;
+                width: 10px;
+                height: 10px;
+                background: #1685b6;
+                border: 1px solid #fff;
+            }
+            .ant-menu-item.ant-menu-item-selected{
+                .label{
+                    color: #ffffff;
+                }
+            }
+            .ant-menu-item{
+                padding-left: 40px !important;
+
+                .label{
+                    color: #ffffff7a;
+                }
+            }
+
+            .router-link-active {
+                background-color: transparent;
+            }
+
+            .ant-menu-submenu-title{
+                padding-left: 10px !important;
+
+                .label{
+                    color: #fff;
+                }
+
+                .ant-menu-submenu-arrow::before{
+                    background-image: linear-gradient(to right, #fff, #fff);
+                }
+                .ant-menu-submenu-arrow::after{
+                    background-image: linear-gradient(to right, #fff, #fff);
+                }
+            }
+        }
+    }
+}

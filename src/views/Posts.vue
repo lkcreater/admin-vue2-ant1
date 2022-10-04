@@ -1,256 +1,161 @@
 <template>
-    <div>
-        <a-row style="margin-top: 20px">
-            <a-col>
-                <a-card :bordered="false" class="header-solid h-full" :bodyStyle="{padding: '0px 0px 50px 0px'}">
-                    <template #title>
-                        <a-row type="flex" align="middle">
-                            <a-col :span="24" :md="12">
-                                <h5 class="font-semibold m-0">Posts Table</h5>
-                            </a-col>
-                            <a-col :span="24" :md="12" style="display: flex; align-items: center; justify-content: flex-end">                                
+	<div>
+        <CardTables
+            ref="CardTables"
+            :title="title"
+            :url="url"
+            :search-object="paramsObject">  
 
-                                <a-radio-group  size="small">
-                                    <a-radio-button value="all">ALL</a-radio-button>
-                                    <a-radio-button value="online">ONLINE</a-radio-button>
-                                </a-radio-group>
+            <!-- slot action -->
+            <template slot="action" >
+                <a-input-search 
+                    style="max-width: 300px; margin-right:15px"
+                    size="small" 
+                    placeholder="input search text" 
+                    @search="onSearch" />
 
-                                <a-button type="primary" size="small" style="margin-left: 15px;" @click="$router.push({ path: '/posts/form' })">
-                                    <a-icon type="plus-circle" theme="filled" />
-                                    Create new post
-                                </a-button>
-                            </a-col>
-                        </a-row>
+                <a-button size="small" type="dashed" @click="onCreate()">
+                    <a-icon type="form" />
+                    Add post
+                </a-button>
+            </template>
+            <!-- slot action -->
+
+            <!-- slot table -->
+            <template  slot="table"  slot-scope="scope">            
+                <a-table
+                    row-key="id" 
+                    :columns="columns"                     
+                    :data-source="scope.data" 
+                    :pagination="scope.pagination"
+                    @change="scope.onChanepage">  
+
+                    <template slot="image" slot-scope="text, record">
+                        <a-avatar 
+                            class="lk-avatar"
+                            shape="square" 
+                            icon="camera"
+                            style="height: 70px;"
+                            :src="imageUrl(record.options.image)">
+                        </a-avatar>
                     </template>
 
-                    <a-table 
-                        :columns="columns" 
-                        :row-key="record => record.id"
-                        :data-source="dataModels"
-                        :pagination="pagination"
-                        :loading="loading"
-                        @change="handleTableChange"
-                        :row-selection="rowSelection"
-                        >
+                    <template slot="contentPost" slot-scope="text, record">
+                        <b>{{ record.title }}</b>
+                        <div>{{ record.content_excerpt }}</div>
+                    </template>
 
-                        <template slot="name" slot-scope="text">
-                            <router-link :to="{ path: 'post/view', params: { userId: '123' }}">{{ text }}</router-link>                            
-                        </template> 
+                    <template slot="createdAt" slot-scope="text, record">
+                        {{ day(text) }}
+                    </template>
 
-                        <template slot="categorys" slot-scope="text, record">  
-                            <a-badge
-                                v-for="ele in text"
-                                :key="ele.cate_id"
-                                :count="ele.cate_title"
-                                :number-style="{
-                                    marginRight: '5px',
-                                    backgroundColor: '#fff',
-                                    color: '#999',
-                                    boxShadow: '0 0 0 1px #d9d9d9 inset',
-                                }"
-                            />                     
-                        </template>
+                    <template slot="updatedAt" slot-scope="text, record">
+                        {{ day(text) }}
+                    </template>
 
-                        <template slot="public_date_at" slot-scope="text, record">  
-                            {{ getFormateDate(text) }}                   
-                        </template>
+                    <div slot="action" slot-scope="record">
+                        <a-button type="dashed" size="small" style="margin-right: 5px" @click="onEdit(record)">
+                            <a-icon type="edit" />
+                            Edit
+                        </a-button> 
+                        <a-popconfirm title="Sure to delete?" @confirm="deleteItem(record.id)">
+                            <a-button type="danger" size="small" >
+                                <a-icon type="delete" />
+                                Del
+                            </a-button>
+                        </a-popconfirm>                                    
+                    </div>
+                </a-table>
+            </template>   
+            <!-- slot table -->
 
-                        <template slot="published" slot-scope="text, record">    
-                            <a-popconfirm title="Sure to active?" @confirm="onChangeActive(record)">      
-                                <a-tag v-if="text == 1" color="#87d068">
-                                    Active
-                                </a-tag>     
-                                <a-tag v-if="text == 0" color="#f50">
-                                    Deactive
-                                </a-tag> 
-                            </a-popconfirm>   
-                        </template>
-
-                        <template slot="action" slot-scope="record">     
-                            <a-button type="dashed" size="small" style="margin-right: 5px" @click="updateItem(record)">
-                                Edit
-                            </a-button> 
-                            <a-popconfirm  @confirm="deleteItem(record)">
-                                <template slot="title">
-                                    <div>Sure to delete ?</div> 
-                                    <span style="font-size: 12px; color: #9d9d9dc9;"> {{ record.title }}} </span>
-                                </template>
-                                <a-button type="danger" size="small" >
-                                    Del
-                                </a-button>
-                            </a-popconfirm>    
-                        </template>
-
-                    </a-table>
-
-                </a-card>
-            </a-col>
-        </a-row>
-    </div>
+        </CardTables>            
+	</div>
 </template>
 
 <script>
-const columns = [
-    {
-        dataIndex: 'title',
-        key: 'title',
-        title: 'Title',
-        scopedSlots: { customRender: 'name' },
-    },
-    {
-        title: 'Categories',
-        dataIndex: 'categorys',
-        key: 'categorys',
-        width: '20%',
-        scopedSlots: { customRender: 'categorys' },
-    },
-    {
-        title: 'Date',
-        dataIndex: 'public_date_at',
-        key: 'public_date_at',
-        width: '15%',
-        scopedSlots: { customRender: 'public_date_at' },
-    },
-    {
-        title: 'Published',
-        key: 'published',
-        dataIndex: 'published',
-        width: '10%',
-        scopedSlots: { customRender: 'published' },
-    },
-    {
-        title: 'Action',
-        key: 'action',
-        width: '15%',
-        scopedSlots: { customRender: 'action' },
-    },
-];
-
-const rowSelection = {
-    onChange: (selectedRowKeys, selectedRows) => {
-        console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-    },
-    onSelect: (record, selected, selectedRows) => {
-        console.log(record, selected, selectedRows);
-    },
-    onSelectAll: (selected, selectedRows, changeRows) => {
-        console.log(selected, selectedRows, changeRows);
-    },
-};
-
-import $ from 'jquery';
+import CardTables from '@/components/Cards/CardTables';
+import CardDetail from '@/components/Post/CardDetail';
+import * as Api from "@/apis/postApi"
+import * as ApiMedia from "@/apis/mediaApi";
 import moment from 'moment';
 
-export default {
-    data(){
-        return {
-            show: true,
-            columns,
-            loading: false,
-            dataModels: [],
-            pagination: {},
-            rowSelection,
-            setPager: 1,
+export default ({
+    components: {
+        CardTables,
+        CardDetail
+    },
+    data() {
+        return {     
+            columns: [
+                { 
+                    title: 'Image', 
+                    key: 'id', 
+                    width: '10%',
+                    scopedSlots: { customRender: 'image' }  
+                },
+                { 
+                    title: 'Title', 
+                    dataIndex: 'title', 
+                    key: 'title', 
+                    scopedSlots: { customRender: 'contentPost' }  ,  
+                },
+                { 
+                    title: 'Create date', 
+                    dataIndex: 'created_at', 
+                    key: 'created_at', 
+                    width: '17%',
+                    scopedSlots: { customRender: 'createdAt' }  
+                },
+                { 
+                    title: 'Update date', 
+                    dataIndex: 'updated_at', 
+                    key: 'updated_at',
+                    width: '17%',
+                    scopedSlots: { customRender: 'updatedAt' },  
+                },
+                { 
+                    title: 'Action', 
+                    dataIndex: '', 
+                    key: 'x',  
+                    width: '16%',
+                    scopedSlots: { customRender: 'action' }, 
+                },
+            ], 
+            url: Api.getUrl(),
+            title: 'Posts Table',
+            paramsObject: {}, 
         }
     },
-    mounted(){
-        this.fetch(1);
-    },
-    methods: {
-        updateItem(item){
-            this.$router.push({ name: 'FormPost', params : { item: item } } )
-        },
-        async deleteItem(item){
-            await this.$models.post.delete(item.id).then((res)=>{
-                if(res.status == 200){ 
-                    this.fetch(this.setPager);
-                }                         
-            })
-            .catch((err) => {
-                this.$notification.error({
-                    message: err.message,
-                    description: err.response.statusText,
-                });
-            });
-        },
-        async fetch(page){
-            this.setPager = page;
-
-            this.loading = true;
-            await this.$models.post.findAll(page).then((res)=>{
-                if(res.status == 200){ 
-                    const { record, meta } = res.data.result;
-                    this.loading = false;
-                    this.dataModels = record;
-
-                    const pagination = { ...this.pagination };
-                    pagination.total = meta.currentRow;
-                    pagination.pageSize = meta.limit;
-                    this.pagination = pagination;
-
-                    console.log(this.dataModels);
-                }                         
-            })
-            .catch((err) => {
-                this.$notification.error({
-                    message: err.message,
-                    description: err.response.statusText,
-                });
-            });
-        },
-        handleTableChange(pagination, filters, sorter) {
-            const pager = { ...this.pagination };
-            pager.current = pagination.current;
-            this.pagination = pager;
-
-            this.fetch(pager.current);
-        },
-        getFormateDate(date){
-            return moment(date).format("MMMM Do YYYY, h:mm a");
-        },
-        async onChangeActive({id, published}){
-            const active = (published == 1) ? 0 : 1;
-            await this.$models.post.active(id, {published: active}).then((res)=>{
-                if(res.status == 200 && res.data.result == true){ 
-                    this.setToggleActive(id, active);
-                }                         
-            })
-            .catch((err) => {
-                this.$notification.error({
-                    message: err.message,
-                    description: err.response.statusText,
-                });
-            });
-        },
-        testJquery(){
-            this.show = !this.show;
-            if(this.show){
-                $('#block-show-jquery').show(300);
-            }else{
-                $('#block-show-jquery').hide(300);
+    methods: {         
+        async deleteItem(id){
+            const respone = await Api.del(id);
+            if(respone.status == 200){
+                this.$refs['CardTables'].reload();
             }
         },
-        setToggleActive(id, active){
-            let data = this.dataModels;
-            data = data.map((item) => {
-                if(id == item.id){
-                    item.published = active;
-                    return item;
-                }else{
-                    return item;
-                }
-            });
-            this.$nextTick(() => {
-                this.dataModels = data;
-            });
+        onCreate(){
+            this.$router.push({ path: '/posts/form' });
+        },
+        onEdit(item){
+
+        },
+        onSearch(val){
+            this.paramsObject = {
+                title: val
+            }
+        },
+        onSuccess(){
+            this.$refs['CardTables'].reload();
+        },
+        day(date){
+            return moment(date).fromNow() //("MMM Do YY h:mm");
+        },
+        imageUrl(file){
+            if(file){
+                return ApiMedia.getUrl(file.url);
+            }
         }
-    }
-}
+    },
+});
 </script>
-
-<style scoped>
-
-.ant-pagination.ant-table-pagination{
-    margin-right: 100px !important;
-}
-</style>

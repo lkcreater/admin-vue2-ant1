@@ -9,8 +9,9 @@
             <a-col style="padding-top: 20px;">
                 <a-upload
                     list-type="picture"
+                    :headers="$store.getters['auth/setHeader']"
                     :show-upload-list="false"
-                    :action="$models.uploadfile"
+                    :action="actionUrl"
                     :before-upload="beforeUpload"
                     @change="handleChange"
                     >
@@ -22,6 +23,8 @@
 </template>
 
 <script>
+import * as Api from '@/apis/mediaApi';
+
 export default {    
     props: ['value'],
     mounted () {
@@ -34,6 +37,7 @@ export default {
     },
     data(){
         return {
+            actionUrl: Api.getUrlUploadImage(),
             loading: false,
             imageUrl: null,
             inputValue: ''
@@ -46,14 +50,14 @@ export default {
                 return;
             }
             if (info.file.status === 'done') {
-                this.onInit(info.file.response.result);
+                this.onInit(info.file.response);
             }
         },
         onInit(file){
             //console.log('val', file);
             if(file.url){
                 this.inputValue = file;
-                this.imageUrl = this.$models.url(this.inputValue.url);
+                this.imageUrl = Api.getUrl(this.inputValue.url);
                 this.loading = false;
 
                 this.$emit('input', this.inputValue);                

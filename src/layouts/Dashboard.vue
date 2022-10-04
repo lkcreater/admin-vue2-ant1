@@ -78,7 +78,7 @@
 <script>
 
 	import DashboardSidebar from '../components/Sidebars/DashboardSidebar' ;
-	import DashboardHeader from '../components/Headers/DashboardNoToper' ;
+	import DashboardHeader from '../components/Headers/DashboardHeader' ;
 	import DashboardFooter from '../components/Footers/DashboardFooter' ;
 	import DashboardSettingsDrawer from '../components/Sidebars/DashboardSettingsDrawer' ;
 

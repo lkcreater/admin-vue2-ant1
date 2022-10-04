@@ -1,11 +1,9 @@
 import http from "@/apis/api";
 
-const UrlApi = `/api/category`;
-
-export const urlFindAll = '';
+const UrlApi = `/api/post`;
 
 export function getUrl(){
-    return http.HOST_API_URL + UrlApi;
+    return `${http.HOST_API_URL}${UrlApi}`;
 }
 
 export function add(data){

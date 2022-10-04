@@ -53,8 +53,8 @@
             font-weight: 500;
             margin-right: 3.75px;
             margin-bottom: 3.75px;
-            background-color: #3a416f;
-            border: 1px solid #3a416f;
+            background-color: #006fa0;
+            border: 1px solid #006fa0;
             color: #fff;
             line-height: 2;
             height: 30px;
@@ -68,7 +68,7 @@
         padding: 10px;
         border: 1px dashed #d9d9d9;
         margin-top: 15px;
-        height: 130px;
+        height: 110px;
         overflow: auto;
     }
 }
@@ -87,6 +87,16 @@
     .ant-avatar{
         margin: 0 5px;
     }
+}
+
+.lk-avatar{
+    width: 100%; 
+    border-radius: 12px;
+    font-size: 100px !important;
+    line-height: 2;
+    color: #b7b7b7;
+    box-shadow: 0 5px 10px rgba(0,0,0,.12)!important;
+    background-color: #c1c1c16b;
 }
 
 hr.gradient-line {

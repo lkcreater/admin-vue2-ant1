@@ -16,6 +16,7 @@
             <a-upload
                 v-if="models == null"
                 name="file"
+                :headers="$store.getters['auth/setHeader']"
                 :action="urlApiUpload"
                 :multiple="false"
                 :show-upload-list="false"

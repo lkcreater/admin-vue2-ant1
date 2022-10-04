@@ -1,27 +1,27 @@
-import { Api, hostname } from "./api";
+import http from "@/apis/api";
 
-const UrlApi = `${hostname}`;
+const UrlApi = `/api/media/upload`;
 
 export function getUrl(file){
-    return `${UrlApi}/${file}`;
+    return `${http.HOST_API_URL}/${file}`;
 }
 
 export function getUrlUpload(){
-    return `${UrlApi}/api/media/upload/file`;
+    return `${http.HOST_API_URL + UrlApi}/file`;
 }
 
 export function getUrlUploadImage(){
-    return `${UrlApi}/api/media/upload/image`;
+    return `${http.HOST_API_URL + UrlApi}/image`;
 }
 
 export function getUrlUploadImageGallery(){
-    return `${UrlApi}/api/media/upload/gallery`;
+    return `${http.HOST_API_URL + UrlApi}/gallery`;
 }
 
 export function upload(data){
-    return Api('post', `${getUrlUpload()}`, data);
+    return http.Api('post', `${getUrlUpload()}`, data, true);
 }
 
 export function uploadImage(data){
-    return Api('post', `${getUrlUploadImage()}`, data);
+    return http.Api('post', `${getUrlUploadImage()}`, data, true);
 }
