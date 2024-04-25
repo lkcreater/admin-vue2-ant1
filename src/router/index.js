@@ -1,10 +1,14 @@
 import Vue from 'vue'
-import VueRouter from 'vue-router'
+import VueRouter from 'vue-router';
 import $store from '@/store';
+
+// load modules
+import routeModuleLpkStore from '@/modules/LpkStore/router';
 
 Vue.use(VueRouter)
 
 let routes = [
+	...routeModuleLpkStore,
 	{
 		// will match everything
 		path: '*',
@@ -139,6 +143,7 @@ const router = new VueRouter({
 	base: process.env.BASE_URL,
 	routes,
 	scrollBehavior (to, from, savedPosition) {
+		//console.log(to);
 		if ( to.hash ) {
 			return {
 				selector: to.hash,
@@ -164,9 +169,9 @@ router.beforeEach( async (to, from, next) => {
 		$store.commit('auth/SET_VERTIFY_AUTH');
 		if($store.getters['auth/isAuthen'] === false){
 
-			if($store.getters['auth/isLockScreen'] === false){
-				return next({ path : '/sign-in' });
-			}			
+			// if($store.getters['auth/isLockScreen'] === false){
+			// 	return next({ path : '/sign-in' });
+			// }			
 		}				
 	}
 

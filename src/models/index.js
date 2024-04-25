@@ -12,6 +12,7 @@ const modelConfig = {
 
 export default {
     install(Vue, options) {
+        //console.log(Vue);
         Vue.prototype.$models =  {
             url: (url) => {
                 return modelConfig.host + url

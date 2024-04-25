@@ -6,6 +6,7 @@
         <!-- avatar -->
         <a-avatar 
             class="lk-avatar-design"
+            :style="{ height: autoHeightThumnail }"
             shape="square" 
             :icon="iconUpload"
             :src="image">
@@ -81,9 +82,21 @@ export default {
     },
     mounted () {
         this.data(this.value);
+
+        window.onresize = (e) => {
+            const width = e.currentTarget.innerWidth;
+            if(width > 1500){
+                this.autoHeightThumnail = `315px`;
+            }
+            if(width < 1500){
+                let cal_heigth = 200*(width/1000);
+                this.autoHeightThumnail = `${cal_heigth}px`;
+            }
+        }
     },
     data(){
         return {
+            autoHeightThumnail: '315px',
             visible: false,
             urlApiUpload: Api.getUrlUploadImage(),
             loading: false,
@@ -153,7 +166,6 @@ export default {
 }
 .lk-avatar-design{
     width: 100%; 
-    height: 315px;
     border-radius: 12px;
     font-size: 100px !important;
     line-height: 3;
